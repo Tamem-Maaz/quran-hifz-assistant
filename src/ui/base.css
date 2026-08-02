@@ -1,0 +1,38 @@
+:root {
+  color-scheme: light dark;
+  --color-bg: #faf7f2;
+  --color-fg: #1a1a1a;
+  --color-accent: #1f6f5c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #14201d;
+    --color-fg: #f4ede1;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: "Almarai", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  min-height: 100vh;
+  padding-inline: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

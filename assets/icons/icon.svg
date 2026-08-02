@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1f6f5c"/>
+  <mask id="crescent-cut">
+    <rect width="512" height="512" fill="white"/>
+    <circle cx="300" cy="230" r="118" fill="black"/>
+  </mask>
+  <circle cx="230" cy="230" r="118" fill="#f4ede1" mask="url(#crescent-cut)"/>
+  <path d="M256 400l14 34 34 14-34 14-14 34-14-34-34-14 34-14z" fill="#f4ede1"/>
+</svg>
