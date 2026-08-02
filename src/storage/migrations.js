@@ -44,6 +44,7 @@ export function createInitialState(now) {
       defaultReps: 10,
       tafsirSourceId: "",
       backupReminderEnabled: true,
+      dailyReviewLimit: 7,
     },
     sessions: [],
     reviewQueue: [],

@@ -213,3 +213,34 @@ export function abandonSession(session) {
 export function findInProgressSessionForDay(sessions, dayKey) {
   return sessions.find((s) => s.status === "in_progress" && s.dayKey === dayKey) ?? null;
 }
+
+/**
+ * يجد أي جلسة مفتوحة بصرف النظر عن يومها — لعرض «استئناف أو إنهاء» حتى لجلسة
+ * متوقفة من يوم سابق (القسم 8).
+ * @param {Session[]} sessions
+ * @returns {Session|null}
+ */
+export function findOpenSession(sessions) {
+  return sessions.find((s) => s.status === "in_progress") ?? null;
+}
+
+const STAGE_ORDER = /** @type {const} */ ([
+  "listeningBefore",
+  "tafsir",
+  "listeningAfter",
+  "memorization",
+  "review",
+  "recitation",
+]);
+
+/**
+ * أول مرحلة غير مكتملة في الجلسة، أو null إن اكتملت كل المراحل الست.
+ * القيمة تُشتق دائمًا من `completedAt` — هذا ما يجعل الاستئناف بلا حاجة لحالة إضافية.
+ * @param {Session} session
+ * @returns {typeof STAGE_ORDER[number]|null}
+ */
+export function currentStageKey(session) {
+  return STAGE_ORDER.find((key) => session.steps[key].completedAt === null) ?? null;
+}
+
+export { STAGE_ORDER };

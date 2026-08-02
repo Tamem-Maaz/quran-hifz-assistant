@@ -16,6 +16,7 @@ export default [
         console: "readonly",
         DOMException: "readonly",
         TextEncoder: "readonly",
+        URL: "readonly",
       },
     },
     rules: {

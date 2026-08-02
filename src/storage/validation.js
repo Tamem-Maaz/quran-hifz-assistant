@@ -178,12 +178,16 @@ function validateSettings(settings) {
   if (!Number.isInteger(settings.defaultReps) || settings.defaultReps < 1) fail("defaultReps غير صالح");
   if (typeof settings.tafsirSourceId !== "string") fail("tafsirSourceId غير صالح");
   if (typeof settings.backupReminderEnabled !== "boolean") fail("backupReminderEnabled غير صالح");
+  if (!Number.isInteger(settings.dailyReviewLimit) || settings.dailyReviewLimit < 1) {
+    fail("dailyReviewLimit غير صالح");
+  }
   return {
     theme: settings.theme,
     fontScale: settings.fontScale,
     defaultReps: settings.defaultReps,
     tafsirSourceId: settings.tafsirSourceId,
     backupReminderEnabled: settings.backupReminderEnabled,
+    dailyReviewLimit: settings.dailyReviewLimit,
   };
 }
 

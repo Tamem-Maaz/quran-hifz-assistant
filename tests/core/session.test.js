@@ -4,9 +4,11 @@ import {
   completeRecitation,
   completeSession,
   createSession,
+  currentStageKey,
   decrementMemorizationRep,
   decrementStep,
   findInProgressSessionForDay,
+  findOpenSession,
   incrementMemorizationRep,
   incrementStep,
   isRecitationDone,
@@ -154,5 +156,57 @@ describe("findInProgressSessionForDay", () => {
 
   it("يعيد null إن لم توجد جلسة مفتوحة لليوم", () => {
     expect(findInProgressSessionForDay([], "2026-08-03")).toBeNull();
+  });
+});
+
+describe("findOpenSession", () => {
+  it("يجد جلسة مفتوحة بصرف النظر عن يومها", () => {
+    const stale = createSession({
+      id: "old",
+      portion: { surah: 1, fromAyah: 1, toAyah: 3 },
+      dayKey: "2026-07-01",
+      now: 1,
+      defaultReps: 5,
+    });
+    expect(findOpenSession([stale])?.id).toBe("old");
+  });
+
+  it("يعيد null بلا جلسات مفتوحة", () => {
+    const completed = completeSession(baseSession(), 10);
+    expect(findOpenSession([completed])).toBeNull();
+  });
+});
+
+describe("currentStageKey", () => {
+  it("يبدأ بأول مرحلة (الاستماع) لجلسة جديدة", () => {
+    expect(currentStageKey(baseSession())).toBe("listeningBefore");
+  });
+
+  it("ينتقل للمرحلة التالية فور اكتمال السابقة", () => {
+    const session = incrementStep(baseSession(), "listeningBefore", 1000);
+    expect(currentStageKey(session)).toBe("tafsir");
+  });
+
+  it("يبقى عند الحفظ حتى بلوغ الهدف كاملًا", () => {
+    let session = baseSession();
+    session = incrementStep(session, "listeningBefore", 1);
+    session = incrementStep(session, "tafsir", 2);
+    session = incrementStep(session, "listeningAfter", 3);
+    expect(currentStageKey(session)).toBe("memorization");
+    for (let i = 0; i < 9; i++) session = incrementMemorizationRep(session, 100 + i);
+    expect(currentStageKey(session)).toBe("memorization"); // 9/10 بعد
+    session = incrementMemorizationRep(session, 200);
+    expect(currentStageKey(session)).toBe("review"); // 10/10
+  });
+
+  it("يعيد null بعد اكتمال كل المراحل الست", () => {
+    let session = baseSession();
+    session = incrementStep(session, "listeningBefore", 1);
+    session = incrementStep(session, "tafsir", 2);
+    session = incrementStep(session, "listeningAfter", 3);
+    for (let i = 0; i < 10; i++) session = incrementMemorizationRep(session, 100 + i);
+    session = incrementStep(session, "review", 4);
+    session = completeRecitation(session, 5, "", "");
+    expect(currentStageKey(session)).toBeNull();
   });
 });

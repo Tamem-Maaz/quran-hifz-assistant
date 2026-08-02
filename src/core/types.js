@@ -106,6 +106,7 @@
  * @property {number} defaultReps
  * @property {string} tafsirSourceId
  * @property {boolean} backupReminderEnabled
+ * @property {number} dailyReviewLimit
  */
 
 export {};
