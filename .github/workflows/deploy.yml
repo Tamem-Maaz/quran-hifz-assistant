@@ -27,6 +27,8 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: تجميع ملفات الموقع فقط (بلا node_modules أو tests أو docs)
         run: |
