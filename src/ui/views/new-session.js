@@ -1,10 +1,12 @@
 /**
- * بدء جلسة جديدة: اختيار السورة (ببحث) ونطاق الآيات (المقطع لا يمتد عبر
- * سورتين — القسم 20)، مع زر اختياري لفتح الخريطة الذهنية للسورة المختارة.
+ * بدء جلسة جديدة: اختيار السورة (ببحث) وأول آية — ونهاية المقطع يحدّدها
+ * النظام من إعداد «عدد آيات السبق»، مقصوصةً عند آخر السورة لأن المقطع لا
+ * يمتد عبر سورتين (القسم 20). الحقل يبقى قابلًا للتعديل لسبقٍ استثنائي.
  */
 
 import { toDayKey } from "../../core/dates.js";
-import { createSession, isValidPortion } from "../../core/session.js";
+import { createSession, isValidPortion, portionEndAyah } from "../../core/session.js";
+import { formatAyahCount } from "../format.js";
 import { el, clear } from "../components/dom.js";
 import { bigButton } from "../components/big-button.js";
 import { cardHead } from "../components/card.js";
@@ -75,18 +77,6 @@ export function render(container, ctx) {
     mapButtonContainer.append(mapButton);
   }
 
-  renderSurahOptions(surahs);
-  updateMapButton();
-
-  searchInput.addEventListener("input", () => {
-    const term = searchInput.value.trim();
-    const filtered = term ? surahs.filter((s) => s.name.includes(term) || String(s.id).includes(term)) : surahs;
-    renderSurahOptions(filtered);
-    updateMapButton();
-  });
-
-  surahSelect.addEventListener("change", updateMapButton);
-
   const fromInput = /** @type {HTMLInputElement} */ (
     el("input", { className: "input", attrs: { id: "from-ayah", type: "number", min: "1", inputmode: "numeric" } })
   );
@@ -95,7 +85,47 @@ export function render(container, ctx) {
   const toInput = /** @type {HTMLInputElement} */ (
     el("input", { className: "input", attrs: { id: "to-ayah", type: "number", min: "1", inputmode: "numeric" } })
   );
-  toInput.value = "1";
+
+  const rangeHint = el("p", { className: "field__hint", attrs: { "aria-live": "polite" } });
+
+  /**
+   * يعيد حساب آخر آية من أول آية وطول السبق المضبوط في الإعدادات. يُستدعى عند
+   * كل تغيّر في السورة أو أول آية — ما يكتبه المستخدم يدويًا في «إلى آية»
+   * يُستبدل عمدًا حينها: أول آية جديدة تعني مقطعًا جديدًا.
+   */
+  function recomputeRange() {
+    const surah = Number(surahSelect.value);
+    const fromAyah = Math.max(1, Number(fromInput.value) || 1);
+    const length = store.getState().settings.ayahsPerPortion;
+    const toAyah = portionEndAyah(surah, fromAyah, length, surahs);
+    toInput.value = String(toAyah);
+
+    const surahInfo = surahs.find((s) => s.id === surah);
+    const actualLength = toAyah - fromAyah + 1;
+    rangeHint.textContent =
+      surahInfo && toAyah >= surahInfo.ayahCount && actualLength < length
+        ? `${formatAyahCount(actualLength)} — آخر السورة (الإعداد ${length})`
+        : `${formatAyahCount(actualLength)} حسب إعداد «عدد آيات السبق»`;
+  }
+
+  renderSurahOptions(surahs);
+  updateMapButton();
+  recomputeRange();
+
+  searchInput.addEventListener("input", () => {
+    const term = searchInput.value.trim();
+    const filtered = term ? surahs.filter((s) => s.name.includes(term) || String(s.id).includes(term)) : surahs;
+    renderSurahOptions(filtered);
+    updateMapButton();
+    recomputeRange();
+  });
+
+  surahSelect.addEventListener("change", () => {
+    updateMapButton();
+    recomputeRange();
+  });
+
+  fromInput.addEventListener("input", recomputeRange);
 
   const errorBox = el("p", { className: "error-text", attrs: { role: "alert" } });
 
@@ -119,6 +149,8 @@ export function render(container, ctx) {
       dayKey: toDayKey(new Date(nowMs)),
       now: nowMs,
       defaultReps: state.settings.defaultReps,
+      listeningBeforeReps: state.settings.listeningBeforeReps,
+      listeningAfterReps: state.settings.listeningAfterReps,
     });
 
     store.setState({ ...state, sessions: [...state.sessions, session] });
@@ -128,7 +160,10 @@ export function render(container, ctx) {
   const view = el("div", { className: "view view-new-session" }, [
     el("section", { className: "card card--hero" }, [
       cardHead("بدء سبق جديد", { eyebrow: "السبق", level: "h1" }),
-      el("p", { className: "muted", text: "المقطع لا يمتدّ عبر سورتين — اختر السورة ثم حدّ آياتها." }),
+      el("p", {
+        className: "muted",
+        text: "اختر السورة وأول آية — ونهاية المقطع يحدّدها النظام من إعداد «عدد آيات السبق».",
+      }),
       el("div", { className: "field" }, [
         el("label", { className: "label", text: "ابحث عن سورة", attrs: { for: "surah-search" } }),
         searchInput,
@@ -145,8 +180,9 @@ export function render(container, ctx) {
           fromInput,
         ]),
         el("div", { className: "field" }, [
-          el("label", { className: "label", text: "إلى آية", attrs: { for: "to-ayah" } }),
+          el("label", { className: "label", text: "إلى آية (يحدّدها النظام)", attrs: { for: "to-ayah" } }),
           toInput,
+          rangeHint,
         ]),
       ]),
       errorBox,

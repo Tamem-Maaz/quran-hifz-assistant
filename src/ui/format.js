@@ -39,3 +39,16 @@ export function formatPortion(portion, surahs) {
     ? `${name} ${portion.fromAyah}`
     : `${name} ${portion.fromAyah} — ${portion.toAyah}`;
 }
+
+/**
+ * صيغة العدد مع تمييزه بالعربية: المفرد والمثنّى وجمع القلّة (3–10) ثم
+ * التمييز المفرد (11 فأكثر). «5 آية» خطأ نحوي يلفت النظر في نصّ عن القرآن.
+ * @param {number} count
+ * @returns {string} مثل "آية واحدة" أو "آيتان" أو "5 آيات" أو "12 آية"
+ */
+export function formatAyahCount(count) {
+  if (count === 1) return "آية واحدة";
+  if (count === 2) return "آيتان";
+  if (count >= 3 && count <= 10) return `${count} آيات`;
+  return `${count} آية`;
+}

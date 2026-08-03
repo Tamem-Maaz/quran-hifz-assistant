@@ -47,6 +47,35 @@ describe("validateImportedState — المسار السليم", () => {
     expect(result.settings.theme).toBe("system");
   });
 
+  it("يقبل نسخة احتياطية قديمة (إصدار 1) ويملأ الحقول المستحدثة بقيمها الافتراضية", () => {
+    const state = validState();
+    const legacy = {
+      ...state,
+      schemaVersion: 1,
+      settings: {
+        theme: "system",
+        fontScale: "md",
+        defaultReps: 10,
+        tafsirSourceId: "",
+        backupReminderEnabled: true,
+        dailyReviewLimit: 7,
+      },
+      sessions: state.sessions.map((session) => ({
+        ...session,
+        steps: {
+          ...session.steps,
+          listeningBefore: { count: session.steps.listeningBefore.count, completedAt: 1000 },
+        },
+      })),
+    };
+
+    const result = validateImportedState(JSON.stringify(legacy), surahs);
+    expect(result.settings.listeningBeforeReps).toBe(1);
+    expect(result.settings.listeningAfterReps).toBe(1);
+    expect(result.settings.ayahsPerPortion).toBe(5);
+    expect(result.sessions[0].steps.listeningBefore.targetCount).toBe(1);
+  });
+
   it("يتجاهل الحقول الزائدة بدل تمريرها", () => {
     const state = { ...validState(), extraField: "لا يجب أن يظهر" };
     const result = validateImportedState(JSON.stringify(state), surahs);

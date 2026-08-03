@@ -69,6 +69,17 @@
     display: none;
   }
 
+  /* عنوان مجموعة حقول: يفصل ما قبله بخطّ شعري ويسمّي ما بعده */
+  .settings-group {
+    margin-block-start: var(--space-2);
+    padding-block-start: var(--space-4);
+    border-block-start: var(--border-hair) solid var(--rule);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    color: var(--ornament-text);
+  }
+
   /* حدّا المقطع حقلان مترابطان: يوضعان جنبًا إلى جنب ليُقرآ مدىً واحدًا */
   .ayah-range {
     display: grid;

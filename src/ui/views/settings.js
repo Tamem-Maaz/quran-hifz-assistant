@@ -95,6 +95,10 @@ function buildPreferencesCard(ctx, state, ui) {
   );
   fontScaleSelect.value = state.settings.fontScale;
 
+  const listeningBeforeInput = numberInput("settings-listening-before", state.settings.listeningBeforeReps);
+  const listeningAfterInput = numberInput("settings-listening-after", state.settings.listeningAfterReps);
+  const ayahsPerPortionInput = numberInput("settings-ayahs-per-portion", state.settings.ayahsPerPortion);
+
   const defaultRepsInput = /** @type {HTMLInputElement} */ (
     el("input", { className: "input", attrs: { type: "number", min: "1", id: "settings-default-reps" } })
   );
@@ -119,6 +123,12 @@ function buildPreferencesCard(ctx, state, ui) {
         theme: /** @type {'light'|'dark'|'system'} */ (themeSelect.value),
         fontScale: /** @type {'sm'|'md'|'lg'|'xl'} */ (fontScaleSelect.value),
         defaultReps: Math.max(1, Number(defaultRepsInput.value) || current.settings.defaultReps),
+        listeningBeforeReps: Math.max(
+          1,
+          Number(listeningBeforeInput.value) || current.settings.listeningBeforeReps
+        ),
+        listeningAfterReps: Math.max(1, Number(listeningAfterInput.value) || current.settings.listeningAfterReps),
+        ayahsPerPortion: Math.max(1, Number(ayahsPerPortionInput.value) || current.settings.ayahsPerPortion),
         dailyReviewLimit: Math.max(1, Number(dailyLimitInput.value) || current.settings.dailyReviewLimit),
         backupReminderEnabled: backupReminderInput.checked,
       },
@@ -128,28 +138,31 @@ function buildPreferencesCard(ctx, state, ui) {
 
   const children = [
     cardHead("الإعدادات", { eyebrow: "التفضيلات", level: "h1" }),
-    el("div", { className: "field" }, [
-      el("label", { className: "label", text: "المظهر", attrs: { for: "settings-theme" } }),
-      themeSelect,
-    ]),
-    el("div", { className: "field" }, [
-      el("label", { className: "label", text: "حجم الخط", attrs: { for: "settings-font-scale" } }),
-      fontScaleSelect,
-    ]),
-    el("div", { className: "field" }, [
-      el("label", { className: "label", text: "عدد التكرارات الافتراضي", attrs: { for: "settings-default-reps" } }),
-      defaultRepsInput,
-    ]),
-    el("div", { className: "field" }, [
-      el("label", { className: "label", text: "الحد الأقصى لمراجعات اليوم", attrs: { for: "settings-daily-limit" } }),
-      dailyLimitInput,
-    ]),
+
+    group("المظهر"),
+    field("المظهر", "settings-theme", themeSelect),
+    field("حجم الخط", "settings-font-scale", fontScaleSelect),
+
+    group("جلسة السبق"),
+    field(
+      "عدد آيات السبق",
+      "settings-ayahs-per-portion",
+      ayahsPerPortionInput,
+      "تكتب أول آية عند بدء السبق، والنظام يحدّد آخره بهذا العدد داخل السورة نفسها."
+    ),
+    field("مرات الاستماع قبل التفسير", "settings-listening-before", listeningBeforeInput),
+    field("مرات الاستماع بعد التفسير", "settings-listening-after", listeningAfterInput),
+    field("عدد التكرارات الافتراضي", "settings-default-reps", defaultRepsInput),
+
+    group("المراجعة والبيانات"),
+    field("الحد الأقصى لمراجعات اليوم", "settings-daily-limit", dailyLimitInput),
     el("div", { className: "field" }, [
       el("label", { className: "checkbox-row" }, [
         backupReminderInput,
         el("span", { text: "تذكير النسخ الاحتياطي كل 30 يومًا" }),
       ]),
     ]),
+
     el("div", { className: "actions actions--inline" }, [bigButton({ text: "حفظ", onClick: handleSave })]),
   ];
 
@@ -158,6 +171,44 @@ function buildPreferencesCard(ctx, state, ui) {
   }
 
   return el("section", { className: "card" }, children);
+}
+
+/**
+ * حقل رقمي موجب: كل الإعدادات العددية هنا عدّاتٌ لا تقلّ عن واحد.
+ * @param {string} id
+ * @param {number} value
+ * @returns {HTMLInputElement}
+ */
+function numberInput(id, value) {
+  const input = /** @type {HTMLInputElement} */ (
+    el("input", { className: "input", attrs: { type: "number", min: "1", inputmode: "numeric", id } })
+  );
+  input.value = String(value);
+  return input;
+}
+
+/**
+ * حقل بتسمية مرتبطة وتلميح اختياري تحته.
+ * @param {string} label
+ * @param {string} id
+ * @param {HTMLElement} control
+ * @param {string} [hint]
+ * @returns {HTMLElement}
+ */
+function field(label, id, control, hint) {
+  const children = [el("label", { className: "label", text: label, attrs: { for: id } }), control];
+  if (hint) children.push(el("p", { className: "field__hint", text: hint }));
+  return el("div", { className: "field" }, children);
+}
+
+/**
+ * عنوان مجموعة داخل بطاقة الإعدادات: الإعدادات صارت تسعة، وتقسيمها إلى
+ * ثلاث مجموعات مسمّاة يجعل البحث فيها نظرًا لا قراءةً سطرًا سطرًا.
+ * @param {string} title
+ * @returns {HTMLElement}
+ */
+function group(title) {
+  return el("p", { className: "settings-group", text: title });
 }
 
 function buildBackupCard(ctx, state, ui) {

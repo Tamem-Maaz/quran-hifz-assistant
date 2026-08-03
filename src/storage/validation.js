@@ -5,7 +5,7 @@
  */
 
 import { isValidPortion } from "../core/session.js";
-import { CURRENT_SCHEMA_VERSION } from "./migrations.js";
+import { CURRENT_SCHEMA_VERSION, DEFAULT_AYAHS_PER_PORTION } from "./migrations.js";
 
 /** @typedef {import('../core/types.js').AppState} AppState */
 
@@ -66,11 +66,27 @@ function validatePortion(portion, surahs) {
   return { surah, fromAyah, toAyah };
 }
 
+/**
+ * حقول أُضيفت في مخطط لاحق تُقرأ بتساهل لا برفض: ملفات النسخ الاحتياطي
+ * المصدَّرة قبل إضافتها لا تحملها، ورفضها كان سيُبطل كل نسخة قديمة للمستخدم.
+ * الملف يحتفظ بـ schemaVersion الخاص به، فالترحيل يُقوّمه عند أول تحميل.
+ * @param {unknown} value
+ * @param {number} fallback
+ * @returns {number}
+ */
+function asCountOrDefault(value, fallback) {
+  return Number.isInteger(value) && /** @type {number} */ (value) >= 1 ? /** @type {number} */ (value) : fallback;
+}
+
 function validateStepState(step, fieldName) {
   if (step === null || typeof step !== "object" || !isPositiveNumber(step.count)) {
     fail(`${fieldName} غير صالحة`);
   }
-  return { count: step.count, completedAt: validateTimestampOrNull(step.completedAt, fieldName) };
+  return {
+    count: step.count,
+    targetCount: asCountOrDefault(step.targetCount, 1),
+    completedAt: validateTimestampOrNull(step.completedAt, fieldName),
+  };
 }
 
 function validateMemorizationStep(step) {
@@ -185,6 +201,9 @@ function validateSettings(settings) {
     theme: settings.theme,
     fontScale: settings.fontScale,
     defaultReps: settings.defaultReps,
+    listeningBeforeReps: asCountOrDefault(settings.listeningBeforeReps, 1),
+    listeningAfterReps: asCountOrDefault(settings.listeningAfterReps, 1),
+    ayahsPerPortion: asCountOrDefault(settings.ayahsPerPortion, DEFAULT_AYAHS_PER_PORTION),
     tafsirSourceId: settings.tafsirSourceId,
     backupReminderEnabled: settings.backupReminderEnabled,
     dailyReviewLimit: settings.dailyReviewLimit,

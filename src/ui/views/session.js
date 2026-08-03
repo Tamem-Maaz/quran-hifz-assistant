@@ -11,6 +11,7 @@ import {
   completeSession,
   currentStageKey,
   decrementMemorizationRep,
+  decrementStep,
   findOpenSession,
   incrementMemorizationRep,
   incrementStep,
@@ -113,13 +114,19 @@ function build(session, ctx) {
 function buildSimpleStage(session, ctx, stageKey) {
   const meta = STAGE_META[stageKey];
   const step = session.steps[stageKey];
+  // هدف 1 = ضغطة واحدة تُنهي المرحلة: لا معنى لعرض حصاة واحدة ولا لزرّ تراجع
+  // لخطوة تنتهي بالضغطة نفسها. الحصى والتراجع يظهران حين يكون للتكرار عدد.
+  const hasTarget = step.targetCount > 1;
 
   return el("section", { className: "card" }, [
     cardHead(meta.title, { eyebrow: stageEyebrow(stageKey) }),
     stepCounter({
       count: step.count,
+      target: hasTarget ? step.targetCount : undefined,
       incrementLabel: meta.actionLabel,
+      progressLabel: `تقدّم ${meta.title}`,
       onIncrement: () => updateSession(ctx, session.id, (s) => incrementStep(s, stageKey, ctx.now())),
+      onDecrement: hasTarget ? () => updateSession(ctx, session.id, (s) => decrementStep(s, stageKey)) : undefined,
     }),
   ]);
 }

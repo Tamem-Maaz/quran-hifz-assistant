@@ -182,6 +182,7 @@
 /**
  * @typedef {Object} StepState
  * @property {number} count
+ * @property {number} targetCount        // لا تكتمل الخطوة قبل بلوغه (1 = ضغطة واحدة)
  * @property {number|null} completedAt
  */
 
@@ -234,8 +235,12 @@
  * @property {'light'|'dark'|'system'} theme
  * @property {'sm'|'md'|'lg'|'xl'} fontScale
  * @property {number} defaultReps
+ * @property {number} listeningBeforeReps   // هدف مرحلة الاستماع قبل التفسير
+ * @property {number} listeningAfterReps    // هدف مرحلة الاستماع بعد التفسير
+ * @property {number} ayahsPerPortion       // طول السبق الافتراضي بالآيات
  * @property {string} tafsirSourceId
  * @property {boolean} backupReminderEnabled
+ * @property {number} dailyReviewLimit
  */
 ```
 
@@ -250,10 +255,10 @@
 
 ```js
 // storage/migrations.js
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
 
 const migrations = {
-  // 1: (state) => ({ ...state, schemaVersion: 2, ... })
+  // 1 ← 2: إعدادات مرات الاستماع وطول السبق، وtargetCount لكل خطوة بسيطة
 };
 
 export function migrate(rawState) { /* تطبيق متسلسل حتى الإصدار الحالي */ }
@@ -490,6 +495,11 @@ export function applyReviewOutcome(item, outcome, todayKey) { /* دالة خال
 
 - المظهر: فاتح / داكن / حسب النظام.
 - حجم الخط: أربعة مستويات.
+- **عدد آيات السبق**: طول المقطع الافتراضي. عند بدء سبق يكتب المستخدم أول آية
+  فقط، والنظام يحدّد آخره بهذا العدد — مقصوصًا عند آخر السورة (المقطع لا يمتد
+  عبر سورتين، القسم 20). الحقل يبقى قابلًا للتعديل لسبق استثنائي.
+- **مرات الاستماع قبل التفسير وبعده**: هدف كل من مرحلتَي الاستماع؛ لا تكتمل
+  المرحلة قبل بلوغه (الهدف 1 = ضغطة واحدة تُنهيها، وهو السلوك الأصلي).
 - عدد التكرارات الافتراضي.
 - مصدر التفسير.
 - الحد الأقصى لمراجعات اليوم.

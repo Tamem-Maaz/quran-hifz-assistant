@@ -13,6 +13,7 @@ import {
   incrementStep,
   isRecitationDone,
   isValidPortion,
+  portionEndAyah,
   recordMistake,
 } from "../../src/core/session.js";
 
@@ -61,6 +62,63 @@ describe("createSession", () => {
     expect(session.steps.memorization.targetReps).toBe(10);
     expect(session.steps.memorization.doneReps).toBe(0);
     expect(session.steps.recitation.completedAt).toBeNull();
+  });
+});
+
+describe("portionEndAyah", () => {
+  it("يحسب آخر آية من أول آية وطول السبق", () => {
+    expect(portionEndAyah(2, 12, 5, surahs)).toBe(16);
+  });
+
+  it("يقصّ المقطع عند آخر السورة بدل تجاوزها", () => {
+    expect(portionEndAyah(1, 5, 10, surahs)).toBe(7);
+  });
+
+  it("طول 1 يعني آية واحدة", () => {
+    expect(portionEndAyah(2, 12, 1, surahs)).toBe(12);
+  });
+
+  it("يعامل الطول غير الصالح كآية واحدة", () => {
+    expect(portionEndAyah(2, 12, 0, surahs)).toBe(12);
+  });
+});
+
+describe("مرات الاستماع كهدف للمرحلة", () => {
+  function sessionWithListening(reps) {
+    return createSession({
+      id: "s2",
+      portion: { surah: 2, fromAyah: 12, toAyah: 15 },
+      dayKey: "2026-08-03",
+      now: 1000,
+      defaultReps: 10,
+      listeningBeforeReps: reps,
+      listeningAfterReps: reps,
+    });
+  }
+
+  it("لا تكتمل مرحلة الاستماع قبل بلوغ عدد المرات المضبوط", () => {
+    let session = sessionWithListening(3);
+    session = incrementStep(session, "listeningBefore", 2000);
+    expect(session.steps.listeningBefore.completedAt).toBeNull();
+    expect(currentStageKey(session)).toBe("listeningBefore");
+
+    session = incrementStep(session, "listeningBefore", 3000);
+    session = incrementStep(session, "listeningBefore", 4000);
+    expect(session.steps.listeningBefore.completedAt).toBe(4000);
+    expect(currentStageKey(session)).toBe("tafsir");
+  });
+
+  it("الهدف الافتراضي 1: ضغطة واحدة تُنهي المرحلة كما قبل الإعداد", () => {
+    const session = incrementStep(baseSession(), "listeningBefore", 2000);
+    expect(session.steps.listeningBefore.targetCount).toBe(1);
+    expect(session.steps.listeningBefore.completedAt).toBe(2000);
+  });
+
+  it("يعامل خطوة قديمة بلا targetCount كهدف 1 (دفاع ما بعد الترحيل)", () => {
+    const legacy = baseSession();
+    delete legacy.steps.review.targetCount;
+    const session = incrementStep(legacy, "review", 5000);
+    expect(session.steps.review.completedAt).toBe(5000);
   });
 });
 

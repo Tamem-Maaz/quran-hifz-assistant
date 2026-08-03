@@ -48,8 +48,11 @@
  */
 
 /**
+ * خطوة بسيطة: لا تكتمل حتى يبلغ `count` قيمة `targetCount` (الهدف 1 = ضغطة
+ * واحدة تُنهيها). مرحلتا الاستماع تأخذان هدفهما من الإعدادات عند إنشاء الجلسة.
  * @typedef {Object} StepState
  * @property {number} count
+ * @property {number} targetCount
  * @property {number|null} completedAt
  */
 
@@ -104,6 +107,9 @@
  * @property {'light'|'dark'|'system'} theme
  * @property {'sm'|'md'|'lg'|'xl'} fontScale
  * @property {number} defaultReps
+ * @property {number} listeningBeforeReps مرات الاستماع قبل قراءة التفسير
+ * @property {number} listeningAfterReps مرات الاستماع بعد قراءة التفسير
+ * @property {number} ayahsPerPortion طول السبق الافتراضي بالآيات
  * @property {string} tafsirSourceId
  * @property {boolean} backupReminderEnabled
  * @property {number} dailyReviewLimit
