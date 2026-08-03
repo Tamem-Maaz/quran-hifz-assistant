@@ -39,6 +39,16 @@ export default [
     },
   },
   {
+    files: ["playwright.config.js", "vitest.config.js", "tests/e2e/**/*.js"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+        Buffer: "readonly",
+        console: "readonly",
+      },
+    },
+  },
+  {
     ignores: ["node_modules/**", "coverage/**", "dist/**", "src/data/surahs.json"],
   },
 ];

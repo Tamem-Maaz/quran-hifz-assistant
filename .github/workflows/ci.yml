@@ -23,5 +23,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run test:coverage
 
-      # خطوة Playwright تُضاف عند وجود تدفقات حرجة فعلية للاختبار (المرحلة 2 فصاعدًا،
-      # راجع القسم 16 من docs/PROJECT_PLAN.md) — تشغيلها الآن بلا اختبارات e2e مضلِّل.
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - run: npm run e2e
