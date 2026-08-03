@@ -1,12 +1,10 @@
-# تراخيص الخطوط
+# ترخيص الخط
 
-كلا الخطّين مرخّصان بـ **SIL Open Font License 1.1** (يسمح بالاستخدام والتوزيع
-وإعادة الاستضافة الذاتية بحرّية، بما في ذلك في مستودع عام) — تم تنزيلهما من
-[Google Fonts](https://fonts.google.com/).
+**Cairo** مرخّص بـ **SIL Open Font License 1.1** (يسمح بالاستخدام والتوزيع
+وإعادة الاستضافة الذاتية بحرّية، بما في ذلك في مستودع عام) — تم تنزيله من
+[Google Fonts](https://fonts.google.com/specimen/Cairo).
 
-- **Almarai** (خط الواجهة) — Copyright 2017 The Almarai Project Authors.
-  https://fonts.google.com/specimen/Almarai
-- **Aref Ruqaa** (خط العناوين) — Copyright 2010-2012 The Aref Ruqaa Project Authors.
-  https://fonts.google.com/specimen/Aref+Ruqaa
+Copyright 2016 The Cairo Font Project Authors
+(https://github.com/Gue3bara/Cairo).
 
 نص الترخيص الكامل: https://openfontlicense.org/

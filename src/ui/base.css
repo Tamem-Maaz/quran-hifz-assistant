@@ -1,100 +1,113 @@
 /**
- * نظام التصميم: لوحة ألوان مستوحاة من مخطوطات القرآن المذهَّبة (رق دافئ +
- * حبر عميق + لمسة ذهبية للزخرفة)، وثنائية خطوط عربيّين — عرف رقعة الخطّاطي
- * للعناوين والأرقام الكبيرة، والمرائي الهندسي الواضح لبقية الواجهة.
- * العلامة الهندسية (نجمة ثمانية بنمط "رُبع الحزب" — علامة تقسيم الحفظ
- * التقليدية في المصحف) هي العنصر المميّز الوحيد، تُستخدم بحرص شديد.
+ * نظام التصميم: لوحة تحكّم مينيمال معاصرة — خلفية محايدة شبه بيضاء (أو شبه
+ * سوداء ليلًا)، بطاقات مسطّحة بحدود شعرية بدل ظلال ثقيلة، ولون تمييز واحد
+ * دقيق (نيلي) بدل الألوان الزخرفية المتعددة. خط واحد (Cairo) بأوزان مختلفة
+ * بدل ثنائية خطوط متباينة — التمييز البصري يأتي من الوزن والمسافة لا من
+ * تعدّد الطوابع الطباعية.
  */
 
-/* نستضيف وزنًا واحدًا فقط من كل خط (القسم 15 من خطة الأداء — ميزانية أول
-   تحميل): عرف رقعة 700 (عربي فقط) للعناوين، والمرائي 400 (عربي+لاتيني)
-   لبقية الواجهة. النص الغامق في الأزرار ولافتة التحديث يعتمد على Bold
-   المُصنَّع تركيبيًا من المتصفح فوق هذين الوزنين بدل تحميل ملفات وزن
-   إضافية — الفرق البصري ضئيل في هذا السياق (تسميات قصيرة)، والوفر
-   يتجاوز 110 كيلوبايت. عناوين تحوي أرقامًا لاتينية (نادر) تتساقط إلى
-   المرائي المحمَّل أصلًا بدل تحميل عرف رقعة اللاتيني لهذا الغرض وحده. */
+/* وزن واحد إضافي (600) هذه المرّة مقارنة بالتصميم السابق — الآن بخط واحد
+   بدل اثنين، فالميزانية الإجمالية أقل رغم إضافته (القسم 15 من خطة الأداء). */
 @font-face {
-  font-family: "Aref Ruqaa";
+  font-family: "Cairo";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../assets/fonts/cairo-400-arabic.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200E;
+}
+@font-face {
+  font-family: "Cairo";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../assets/fonts/cairo-400-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+2000-206F;
+}
+@font-face {
+  font-family: "Cairo";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../../assets/fonts/cairo-600-arabic.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200E;
+}
+@font-face {
+  font-family: "Cairo";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../../assets/fonts/cairo-600-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+2000-206F;
+}
+@font-face {
+  font-family: "Cairo";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("../../assets/fonts/aref-ruqaa-700-arabic.woff2") format("woff2");
+  src: url("../../assets/fonts/cairo-700-arabic.woff2") format("woff2");
   unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200E;
 }
 @font-face {
-  font-family: "Almarai";
+  font-family: "Cairo";
   font-style: normal;
-  font-weight: 400;
+  font-weight: 700;
   font-display: swap;
-  src: url("../../assets/fonts/almarai-400-arabic.woff2") format("woff2");
-  unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200E;
-}
-@font-face {
-  font-family: "Almarai";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../../assets/fonts/almarai-400-latin.woff2") format("woff2");
+  src: url("../../assets/fonts/cairo-700-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+2000-206F;
 }
 
 :root {
   color-scheme: light dark;
-  --color-bg: #fbf6ec;
+  --color-bg: #fafafa;
   --color-surface: #ffffff;
-  --color-fg: #211d14;
-  --color-accent: #1f6f5c;
-  /* --color-accent (خلفيات فقط) لا يبلغ 3:1 كحدود/نص فوق الخلفية الداكنة —
-     متغيّر منفصل للحدود ومؤشرات التركيز يُعاد تعريفه في السمة الداكنة. */
-  --color-accent-border: #1f6f5c;
-  --color-error: #b3413a;
-  --color-gold: #a9791e;
-  --color-gold-text: #8d6b1b;
+  --color-fg: #18181b;
+  --color-border: #e4e4e7;
+  --color-accent: #4f46e5;
+  --color-accent-border: #4f46e5;
+  --color-error: #dc2626;
 
-  --font-display: "Aref Ruqaa", "Almarai", "Traditional Arabic", serif;
-  --font-body: "Almarai", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --font-display: "Cairo", system-ui, sans-serif;
+  --font-body: "Cairo", system-ui, sans-serif;
 
-  --radius-sm: 0.6rem;
-  --radius-md: 0.9rem;
-  --radius-lg: 1.4rem;
-  --shadow-card: 0 1px 2px rgba(30, 20, 5, 0.04), 0 6px 20px -8px rgba(30, 20, 5, 0.12);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --shadow-card: 0 1px 2px rgba(24, 24, 27, 0.04);
 
   --sidebar-width: 15rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #101b17;
-    --color-surface: #16231e;
-    --color-fg: #f3ecd9;
-    --color-accent-border: #2fa78b;
-    --color-error: #d27a74;
-    --color-gold: #d9a94b;
-    --color-gold-text: #d9a94b;
-    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px -10px rgba(0, 0, 0, 0.5);
+    --color-bg: #0a0a0b;
+    --color-surface: #18181b;
+    --color-fg: #f4f4f5;
+    --color-border: #27272a;
+    --color-accent-border: #818cf8;
+    --color-error: #f87171;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
   }
 }
 
 :root[data-theme="light"] {
-  --color-bg: #fbf6ec;
+  --color-bg: #fafafa;
   --color-surface: #ffffff;
-  --color-fg: #211d14;
-  --color-accent-border: #1f6f5c;
-  --color-error: #b3413a;
-  --color-gold: #a9791e;
-  --color-gold-text: #8d6b1b;
-  --shadow-card: 0 1px 2px rgba(30, 20, 5, 0.04), 0 6px 20px -8px rgba(30, 20, 5, 0.12);
+  --color-fg: #18181b;
+  --color-border: #e4e4e7;
+  --color-accent-border: #4f46e5;
+  --color-error: #dc2626;
+  --shadow-card: 0 1px 2px rgba(24, 24, 27, 0.04);
 }
 
 :root[data-theme="dark"] {
-  --color-bg: #101b17;
-  --color-surface: #16231e;
-  --color-fg: #f3ecd9;
-  --color-accent-border: #2fa78b;
-  --color-error: #d27a74;
-  --color-gold: #d9a94b;
-  --color-gold-text: #d9a94b;
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px -10px rgba(0, 0, 0, 0.5);
+  --color-bg: #0a0a0b;
+  --color-surface: #18181b;
+  --color-fg: #f4f4f5;
+  --color-border: #27272a;
+  --color-accent-border: #818cf8;
+  --color-error: #f87171;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 :root[data-font-scale="sm"] {
@@ -180,10 +193,10 @@ h3 {
 }
 
 .brand-mark {
-  inline-size: 2rem;
-  block-size: 2rem;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
   flex-shrink: 0;
-  color: var(--color-gold);
+  color: var(--color-accent-border);
 }
 
 .app-header__title {
@@ -196,10 +209,10 @@ h3 {
 
 .app-nav {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.25rem;
   padding-block: 0.25rem;
   overflow-x: auto;
-  border-block-end: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+  border-block-end: 1px solid var(--color-border);
   mask-image: linear-gradient(to right, transparent, black 1rem, black calc(100% - 1rem), transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black 1rem, black calc(100% - 1rem), transparent);
 }
@@ -213,20 +226,20 @@ h3 {
   gap: 0.75rem;
   flex-wrap: wrap;
   padding-block: 0.6rem;
-  border-block-end: 1px solid color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border-block-end: 1px solid var(--color-border);
 }
 
 .app-topbar__page {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-fg);
 }
 
 .app-topbar__page svg {
-  inline-size: 1.15rem;
-  block-size: 1.15rem;
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
   color: var(--color-accent-border);
   flex-shrink: 0;
 }
@@ -238,11 +251,12 @@ h3 {
 }
 
 .app-topbar__badge {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--color-fg);
-  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
-  border-radius: 999px;
-  padding: 0.3rem 0.7rem;
+  background: color-mix(in srgb, var(--color-fg) 5%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
   white-space: nowrap;
 }
 
@@ -264,17 +278,17 @@ h3 {
 }
 
 .nav-btn svg {
-  inline-size: 1.15rem;
-  block-size: 1.15rem;
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
   flex-shrink: 0;
 }
 
 .nav-btn:hover {
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  background: color-mix(in srgb, var(--color-fg) 6%, transparent);
 }
 
 .nav-btn:focus-visible {
-  outline: 3px solid var(--color-accent-border);
+  outline: 2px solid var(--color-accent-border);
   outline-offset: 2px;
 }
 
@@ -293,7 +307,7 @@ h3 {
 
 .card {
   background: var(--color-surface);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
   padding: 1.25rem;
@@ -306,33 +320,16 @@ h3 {
   font-size: 1.15rem;
 }
 
-.card--hero {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--color-accent) 10%, var(--color-surface)), var(--color-surface) 65%);
-}
-
-.card--hero__watermark {
-  position: absolute;
-  inset-inline-end: -3.5rem;
-  inset-block-start: -3.5rem;
-  inline-size: 11rem;
-  block-size: 11rem;
-  color: var(--color-gold);
-  opacity: 0.08;
-  pointer-events: none;
-}
-
 /* ===== الأزرار ===== */
 
 .btn {
-  min-height: 64px;
+  min-height: 44px;
   min-width: 44px;
-  padding-inline: 1.25rem;
+  padding-inline: 1.1rem;
   border-radius: var(--radius-md);
-  border: 2px solid transparent;
-  font-size: 1rem;
-  font-weight: 700;
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
   transition: transform 0.1s ease, background-color 0.15s ease, opacity 0.15s ease;
@@ -636,7 +633,7 @@ h3 {
   border: none;
   background: #fff;
   color: var(--color-accent);
-  font-weight: 700;
+  font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
 }
@@ -659,7 +656,7 @@ h3 {
 }
 
 .lightbox::backdrop {
-  background: rgba(10, 8, 4, 0.8);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 .lightbox__image {
@@ -752,7 +749,7 @@ h3 {
     top: 2rem;
     align-self: start;
     gap: 1.75rem;
-    border-inline-end: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+    border-inline-end: 1px solid var(--color-border);
     padding-inline-end: 1.25rem;
   }
 
@@ -774,8 +771,7 @@ h3 {
     position: sticky;
     top: 2rem;
     z-index: 5;
-    background: color-mix(in srgb, var(--color-bg) 94%, transparent);
-    backdrop-filter: blur(6px);
+    background: var(--color-bg);
   }
 
   .stat-grid {
