@@ -414,3 +414,67 @@ h1 {
   outline: 3px solid #fff;
   outline-offset: 2px;
 }
+
+.lightbox {
+  position: relative;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0;
+  max-width: 92vw;
+  max-height: 92vh;
+  background: transparent;
+}
+
+.lightbox::backdrop {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.lightbox__image {
+  display: block;
+  max-width: 92vw;
+  max-height: 92vh;
+  width: auto;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.lightbox__close {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.lightbox__close:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.map-thumb-button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  display: block;
+  width: 100%;
+}
+
+.map-thumb-button:focus-visible {
+  outline: 3px solid var(--color-accent-border);
+  outline-offset: 2px;
+}
+
+.map-thumb-button img {
+  border-radius: 0.5rem;
+  display: block;
+  width: 100%;
+  height: auto;
+}
