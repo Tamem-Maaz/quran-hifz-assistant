@@ -6,10 +6,9 @@ import { createRepository } from "./storage/repository.js";
 import { createStore } from "./ui/store.js";
 import { startRouter, navigate } from "./ui/router.js";
 import { el, clear } from "./ui/components/dom.js";
-import { brandMark, navIcon } from "./ui/components/icons.js";
+import { brandMark, navIcon, rosette } from "./ui/components/icons.js";
 import { toDayKey } from "./core/dates.js";
 import { computeStreak } from "./core/statistics.js";
-import { formatDayKeyShort } from "./ui/format.js";
 import * as todayView from "./ui/views/today.js";
 import * as newSessionView from "./ui/views/new-session.js";
 import * as sessionView from "./ui/views/session.js";
@@ -28,21 +27,15 @@ const VIEWS = {
   settings: settingsView,
 };
 
-/** بيانات وصفية لكل مسار — تُستخدم للتنقّل الجانبي (خمسة مسارات رئيسية فقط)
- * ولشريط المعلومات العلوي (كل المسارات السبعة، بما فيها بدء السبق والجلسة
- * غير الظاهرين في القائمة الجانبية). */
-const ROUTE_META = {
-  today: { label: "اليوم", icon: /** @type {const} */ ("today") },
-  "new-session": { label: "بدء سبق جديد", icon: /** @type {const} */ ("new-session") },
-  session: { label: "جلسة الحفظ", icon: /** @type {const} */ ("session") },
-  review: { label: "المراجعة", icon: /** @type {const} */ ("review") },
-  stats: { label: "الإحصائيات", icon: /** @type {const} */ ("stats") },
-  maps: { label: "الخرائط الذهنية", icon: /** @type {const} */ ("maps") },
-  settings: { label: "الإعدادات", icon: /** @type {const} */ ("settings") },
-};
-
-const NAV_ROUTES = /** @type {const} */ (["today", "review", "stats", "maps", "settings"]);
-const NAV_LINKS = NAV_ROUTES.map((route) => ({ route, ...ROUTE_META[route] }));
+/** روابط التنقّل الخمسة. بدء السبق وشاشة الجلسة ليسا هنا عمدًا: يُدخَل
+ * إليهما من لوحة اليوم في سياقهما، لا من قائمة دائمة. */
+const NAV_LINKS = /** @type {const} */ ([
+  { route: "today", label: "اليوم", icon: "today" },
+  { route: "review", label: "المراجعة", icon: "review" },
+  { route: "stats", label: "الإحصائيات", icon: "stats" },
+  { route: "maps", label: "الخرائط الذهنية", icon: "maps" },
+  { route: "settings", label: "الإعدادات", icon: "settings" },
+]);
 
 async function main() {
   const app = document.getElementById("app");
@@ -62,24 +55,20 @@ async function main() {
   store.subscribe((state) => applyTheme(state.settings));
 
   const navContainer = el("nav", { className: "app-nav", attrs: { "aria-label": "التنقّل الرئيسي" } });
-  const sidebar = el("div", { className: "app-sidebar" }, [buildHeader(), navContainer]);
-  const topbarContainer = el("div", { className: "app-topbar" });
-  const viewContainer = el("div", { className: "view-container" });
-  const mainColumn = el("div", { className: "app-main" }, [topbarContainer, viewContainer]);
-  app.append(sidebar, mainColumn);
+  const statusContainer = el("div", { className: "app-status" });
+  const sidebar = el("div", { className: "app-sidebar" }, [buildHeader(), navContainer, statusContainer]);
+  const viewContainer = el("main", { className: "app-main" });
+  app.append(sidebar, viewContainer);
 
   const ctx = { store, surahs, maps, now: () => Date.now() };
   /** @type {(() => void) | null} */
   let cleanup = null;
-  /** @type {import('./ui/router.js').Route} */
-  let currentRoute = "today";
 
-  store.subscribe(() => renderTopbar(topbarContainer, currentRoute, ctx));
+  renderStatus(statusContainer, ctx);
+  store.subscribe(() => renderStatus(statusContainer, ctx));
 
   startRouter((route) => {
-    currentRoute = route;
     renderNav(navContainer, route);
-    renderTopbar(topbarContainer, route, ctx);
     if (cleanup) cleanup();
     const result = VIEWS[route].render(viewContainer, ctx);
     cleanup = typeof result === "function" ? result : null;
@@ -142,10 +131,10 @@ function showUpdateBanner(registration) {
     window.location.reload();
   });
 
-  const banner = el("div", { className: "update-banner", attrs: { role: "status" } }, [
+  const banner = el("div", { className: "banner", attrs: { role: "status" } }, [
     el("span", { text: "يتوفر تحديث للتطبيق" }),
     el("button", {
-      className: "update-banner__button",
+      className: "btn btn-primary btn--sm",
       text: "إعادة التحميل",
       attrs: { type: "button" },
       onClick: () => registration.waiting?.postMessage("SKIP_WAITING"),
@@ -170,7 +159,10 @@ function applyTheme(settings) {
 function buildHeader() {
   return el("header", { className: "app-header" }, [
     brandMark(),
-    el("p", { className: "app-header__title", text: "حفظ القرآن", attrs: { title: "المساعد بحفظ القرآن الكريم" } }),
+    el("div", { className: "app-header__text" }, [
+      el("p", { className: "app-header__title", text: "حفظ القرآن", attrs: { title: "المساعد بحفظ القرآن الكريم" } }),
+      el("p", { className: "app-header__subtitle", text: "سبقٌ كل يوم، ومراجعةٌ في وقتها" }),
+    ]),
   ]);
 }
 
@@ -184,6 +176,10 @@ function renderNav(container, activeRoute) {
   clear(container);
   for (const link of NAV_LINKS) {
     const isActive = link.route === activeRoute;
+    const children = [navIcon(link.icon), el("span", { text: link.label })];
+    // علامة الربع في الهامش تدلّ على الصفحة الحالية — كما تُعلَّم الأرباع في
+    // هامش المصحف. aria-current وحده هو ما يبلّغ القارئات؛ العلامة زخرفية.
+    if (isActive) children.push(rosette("nav-btn__marker"));
     container.append(
       el(
         "button",
@@ -192,33 +188,34 @@ function renderNav(container, activeRoute) {
           attrs: { type: "button", ...(isActive ? { "aria-current": "page" } : {}) },
           onClick: () => navigate(link.route),
         },
-        [navIcon(link.icon), el("span", { text: link.label })]
+        children
       )
     );
   }
 }
 
 /**
- * شريط المعلومات العلوي: عنوان الصفحة الحالية (كتنقّل تكميلي، لا بديل عن
- * عنوان الصفحة ذاته) + معلومات سياقية عامة (تاريخ اليوم والتتابع الحالي)
- * مفيدة بصرف النظر عن الصفحة المعروضة. يُعاد بناؤه عند كل تغيّر مسار أو حالة.
+ * حالة اليوم في الهامش: التتابع الحالي. معلومة صحيحة أيًّا كانت الشاشة
+ * المعروضة، فمكانها الهامش الثابت لا رأس كل شاشة. يُعاد البناء عند كل تغيّر
+ * حالة (قد يتغيّر التتابع بإتمام سبق أو مراجعة).
  * @param {HTMLElement} container
- * @param {import('./ui/router.js').Route} route
  * @param {import('./ui/store.js').AppContext} ctx
  */
-function renderTopbar(container, route, ctx) {
+function renderStatus(container, ctx) {
   clear(container);
-  const meta = ROUTE_META[route];
   const state = ctx.store.getState();
   const todayKey = toDayKey(new Date(ctx.now()));
   const { current: streak } = computeStreak(state.sessions, state.reviewQueue, todayKey);
 
+  // التاريخ لا يتكرّر هنا: لوحة اليوم تعرضه في عنوانها، وسائر الشاشات لا
+  // تحتاجه. التتابع وحده هو ما يفيد أيًّا كانت الشاشة المفتوحة.
   container.append(
-    el("div", { className: "app-topbar__page" }, [navIcon(meta.icon), el("span", { text: meta.label })]),
-    el("div", { className: "app-topbar__meta" }, [
-      el("span", { className: "app-topbar__badge", text: formatDayKeyShort(todayKey) }),
-      el("span", { className: "app-topbar__badge", text: streak > 0 ? `تتابع ${streak}` : "ابدأ تتابعك" }),
-    ])
+    streak > 0
+      ? el("span", { className: "badge badge--gold" }, [
+          rosette("rosette"),
+          el("span", { text: `تتابع ${streak} يومًا` }),
+        ])
+      : el("span", { className: "badge", text: "لا تتابع بعد" })
   );
 }
 

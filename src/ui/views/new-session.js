@@ -7,6 +7,7 @@ import { toDayKey } from "../../core/dates.js";
 import { createSession, isValidPortion } from "../../core/session.js";
 import { el, clear } from "../components/dom.js";
 import { bigButton } from "../components/big-button.js";
+import { cardHead } from "../components/card.js";
 import { openImageLightbox } from "../components/lightbox.js";
 import { navigate } from "../router.js";
 
@@ -21,15 +22,18 @@ export function render(container, ctx) {
 
   const searchInput = /** @type {HTMLInputElement} */ (
     el("input", {
+      className: "input",
       attrs: { type: "search", id: "surah-search", placeholder: "اكتب اسم السورة أو رقمها", autocomplete: "off" },
     })
   );
 
-  const searchStatus = el("p", { className: "muted", attrs: { "aria-live": "polite" } });
+  const searchStatus = el("p", { className: "field__hint", attrs: { "aria-live": "polite" } });
 
-  const surahSelect = /** @type {HTMLSelectElement} */ (el("select", { attrs: { id: "surah-select" } }));
+  const surahSelect = /** @type {HTMLSelectElement} */ (
+    el("select", { className: "select", attrs: { id: "surah-select" } })
+  );
 
-  const mapButtonContainer = el("div", { className: "step-counter__actions" });
+  const mapButtonContainer = el("div", { className: "actions actions--inline" });
 
   /**
    * @param {typeof surahs} filtered
@@ -84,12 +88,12 @@ export function render(container, ctx) {
   surahSelect.addEventListener("change", updateMapButton);
 
   const fromInput = /** @type {HTMLInputElement} */ (
-    el("input", { attrs: { id: "from-ayah", type: "number", min: "1", inputmode: "numeric" } })
+    el("input", { className: "input", attrs: { id: "from-ayah", type: "number", min: "1", inputmode: "numeric" } })
   );
   fromInput.value = "1";
 
   const toInput = /** @type {HTMLInputElement} */ (
-    el("input", { attrs: { id: "to-ayah", type: "number", min: "1", inputmode: "numeric" } })
+    el("input", { className: "input", attrs: { id: "to-ayah", type: "number", min: "1", inputmode: "numeric" } })
   );
   toInput.value = "1";
 
@@ -121,19 +125,35 @@ export function render(container, ctx) {
     navigate("session");
   }
 
-  const view = el("div", { className: "card" }, [
-    el("h2", { text: "بدء سبق جديد" }),
-    el("div", { className: "field" }, [
-      el("label", { text: "ابحث عن سورة", attrs: { for: "surah-search" } }),
-      searchInput,
-      searchStatus,
+  const view = el("div", { className: "view view-new-session" }, [
+    el("section", { className: "card card--hero" }, [
+      cardHead("بدء سبق جديد", { eyebrow: "السبق", level: "h1" }),
+      el("p", { className: "muted", text: "المقطع لا يمتدّ عبر سورتين — اختر السورة ثم حدّ آياتها." }),
+      el("div", { className: "field" }, [
+        el("label", { className: "label", text: "ابحث عن سورة", attrs: { for: "surah-search" } }),
+        searchInput,
+        searchStatus,
+      ]),
+      el("div", { className: "field" }, [
+        el("label", { className: "label", text: "السورة", attrs: { for: "surah-select" } }),
+        surahSelect,
+      ]),
+      mapButtonContainer,
+      el("div", { className: "ayah-range" }, [
+        el("div", { className: "field" }, [
+          el("label", { className: "label", text: "من آية", attrs: { for: "from-ayah" } }),
+          fromInput,
+        ]),
+        el("div", { className: "field" }, [
+          el("label", { className: "label", text: "إلى آية", attrs: { for: "to-ayah" } }),
+          toInput,
+        ]),
+      ]),
+      errorBox,
+      el("div", { className: "actions" }, [
+        bigButton({ text: "ابدأ الجلسة", onClick: handleStart, size: "lg" }),
+      ]),
     ]),
-    el("div", { className: "field" }, [el("label", { text: "السورة", attrs: { for: "surah-select" } }), surahSelect]),
-    mapButtonContainer,
-    el("div", { className: "field" }, [el("label", { text: "من آية", attrs: { for: "from-ayah" } }), fromInput]),
-    el("div", { className: "field" }, [el("label", { text: "إلى آية", attrs: { for: "to-ayah" } }), toInput]),
-    errorBox,
-    el("div", { className: "step-counter__actions" }, [bigButton({ text: "ابدأ الجلسة", onClick: handleStart })]),
   ]);
 
   clear(container);

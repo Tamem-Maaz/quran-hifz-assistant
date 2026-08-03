@@ -15,11 +15,13 @@ import {
   incrementMemorizationRep,
   incrementStep,
   recordMistake,
+  STAGE_ORDER,
 } from "../../core/session.js";
 import { createReviewItem } from "../../core/scheduler.js";
 import { formatPortion } from "../format.js";
 import { el, clear } from "../components/dom.js";
 import { bigButton } from "../components/big-button.js";
+import { cardHead } from "../components/card.js";
 import { stepCounter } from "../components/step-counter.js";
 import { navigate } from "../router.js";
 
@@ -33,6 +35,17 @@ const STAGE_META = {
   review: { title: "المراجعة (قراءة دون نظر)", actionLabel: "راجعت" },
   recitation: { title: "التسميع", actionLabel: "" },
 };
+
+/**
+ * موضع المرحلة من مراحل السبق الست. ترقيم مبرَّر هنا لأن المراحل تسلسل
+ * حقيقي لا تصنيفًا: معرفة «الرابعة من ست» تخبرك كم بقي من الجلسة.
+ * @param {typeof STAGE_ORDER[number]} stageKey
+ * @returns {string}
+ */
+function stageEyebrow(stageKey) {
+  const index = STAGE_ORDER.indexOf(stageKey);
+  return `المرحلة ${index + 1} من ${STAGE_ORDER.length}`;
+}
 
 /**
  * @param {HTMLElement} container
@@ -63,10 +76,14 @@ function build(session, ctx) {
   const { surahs } = ctx;
   const stage = currentStageKey(session);
 
-  const header = el("header", { className: "card" }, [
-    el("h1", { text: "جلسة الحفظ" }),
-    el("p", { className: "portion-badge", text: formatPortion(session.portion, surahs) }),
-    el("div", { className: "step-counter__actions" }, [
+  // الرأس يبقى ثابتًا عبر المراحل الست: ما الذي أحفظه (المقطع) أولًا، ثم
+  // مخرج آمن. عنوان الشاشة نفسه أصغر من المقطع عمدًا — المقطع هو الخبر.
+  const header = el("header", { className: "card card--hero" }, [
+    el("div", { className: "card__eyebrow" }, [
+      el("p", { className: "eyebrow", text: "جلسة الحفظ" }),
+      el("h1", { className: "portion", text: formatPortion(session.portion, surahs) }),
+    ]),
+    el("div", { className: "actions actions--inline" }, [
       bigButton({
         text: "إنهاء الجلسة الآن (تُحفظ كمتوقفة)",
         variant: "danger",
@@ -98,7 +115,7 @@ function buildSimpleStage(session, ctx, stageKey) {
   const step = session.steps[stageKey];
 
   return el("section", { className: "card" }, [
-    el("h2", { text: meta.title }),
+    cardHead(meta.title, { eyebrow: stageEyebrow(stageKey) }),
     stepCounter({
       count: step.count,
       incrementLabel: meta.actionLabel,
@@ -110,7 +127,7 @@ function buildSimpleStage(session, ctx, stageKey) {
 function buildMemorization(session, ctx) {
   const step = session.steps.memorization;
   return el("section", { className: "card" }, [
-    el("h2", { text: STAGE_META.memorization.title }),
+    cardHead(STAGE_META.memorization.title, { eyebrow: stageEyebrow("memorization") }),
     stepCounter({
       count: step.doneReps,
       target: step.targetReps,
@@ -132,10 +149,13 @@ function buildRecitation(session, ctx) {
     state.mistakes.filter((m) => m.surah === portion.surah && m.ayah === ayah).length;
 
   const ayahRows = ayahNumbers.map((ayah) => {
-    const countLabel = el("span", { className: "muted", text: mistakeCount(ayah) > 0 ? `(${mistakeCount(ayah)})` : "" });
-    return el("div", { className: "mistake-row" }, [
-      el("span", { text: `آية ${ayah}` }),
-      countLabel,
+    const count = mistakeCount(ayah);
+    const label = el("span", { className: "row__label" }, [el("span", { text: `آية ${ayah}` })]);
+    if (count > 0) {
+      label.append(el("span", { className: "badge badge--danger", text: `${count} خطأ` }));
+    }
+    return el("div", { className: "row" }, [
+      label,
       bigButton({
         text: "أخطأت هنا",
         variant: "secondary",
@@ -149,26 +169,28 @@ function buildRecitation(session, ctx) {
   });
 
   const listenerInput = /** @type {HTMLInputElement} */ (
-    el("input", { attrs: { type: "text", id: "recitation-listener-name" } })
+    el("input", { className: "input", attrs: { type: "text", id: "recitation-listener-name" } })
   );
   const notesInput = /** @type {HTMLTextAreaElement} */ (
-    el("textarea", { attrs: { rows: "3", id: "recitation-notes" } })
+    el("textarea", { className: "textarea", attrs: { rows: "3", id: "recitation-notes" } })
   );
 
   return el("section", { className: "card" }, [
-    el("h2", { text: STAGE_META.recitation.title }),
-    ...ayahRows,
+    cardHead(STAGE_META.recitation.title, { eyebrow: stageEyebrow("recitation") }),
+    el("p", { className: "muted", text: "سجّل موضع كل تعثّر أثناء التسميع — هذه المواضع هي ما ستُراجعه لاحقًا." }),
+    el("div", {}, ayahRows),
     el("div", { className: "field" }, [
-      el("label", { text: "اسم المسمِّع (اختياري)", attrs: { for: "recitation-listener-name" } }),
+      el("label", { className: "label", text: "اسم المسمِّع (اختياري)", attrs: { for: "recitation-listener-name" } }),
       listenerInput,
     ]),
     el("div", { className: "field" }, [
-      el("label", { text: "ملاحظات (اختياري)", attrs: { for: "recitation-notes" } }),
+      el("label", { className: "label", text: "ملاحظات (اختياري)", attrs: { for: "recitation-notes" } }),
       notesInput,
     ]),
-    el("div", { className: "step-counter__actions" }, [
+    el("div", { className: "actions" }, [
       bigButton({
         text: "أنهيت التسميع",
+        size: "lg",
         onClick: () =>
           updateSession(ctx, session.id, (s) =>
             completeRecitation(s, ctx.now(), listenerInput.value.trim(), notesInput.value.trim())
@@ -189,11 +211,16 @@ function requestPersistentStorage() {
 }
 
 function buildFinish(session, ctx) {
-  return el("section", { className: "card" }, [
-    el("h2", { text: "أحسنت! اكتملت كل مراحل السبق" }),
-    el("div", { className: "step-counter__actions" }, [
+  return el("section", { className: "card card--hero" }, [
+    cardHead("أحسنت! اكتملت كل مراحل السبق", { eyebrow: `تمّت المراحل الست` }),
+    el("p", {
+      className: "muted",
+      text: "بإنهاء الجلسة يدخل هذا المقطع في جدول المراجعة، ويعود إليك في موعده.",
+    }),
+    el("div", { className: "actions" }, [
       bigButton({
         text: "إنهاء الجلسة وجدولة المراجعة",
+        size: "lg",
         onClick: () => {
           const now = ctx.now();
           const todayKey = toDayKey(new Date(now));

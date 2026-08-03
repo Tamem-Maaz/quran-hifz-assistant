@@ -7,7 +7,7 @@
  * عند أي نشر يغيّر محتوى ملف مخزَّن مسبقًا (هذا ما يُفعّل مسار الترقية).
  */
 
-const CACHE_VERSION = "v5";
+const CACHE_VERSION = "v6";
 const CACHE_NAME = `quran-hifz-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
@@ -16,12 +16,11 @@ const PRECACHE_URLS = [
   "./manifest.webmanifest",
   "./assets/icons/icon.svg",
   "./assets/icons/icon-maskable.svg",
-  "./assets/fonts/cairo-400-arabic.woff2",
-  "./assets/fonts/cairo-400-latin.woff2",
-  "./assets/fonts/cairo-600-arabic.woff2",
-  "./assets/fonts/cairo-600-latin.woff2",
-  "./assets/fonts/cairo-700-arabic.woff2",
-  "./assets/fonts/cairo-700-latin.woff2",
+  "./assets/fonts/reemkufi-var-arabic.woff2",
+  "./assets/fonts/plex-400-arabic.woff2",
+  "./assets/fonts/plex-400-latin.woff2",
+  "./assets/fonts/plex-600-arabic.woff2",
+  "./assets/fonts/plex-600-latin.woff2",
   "./src/main.js",
   "./src/version.js",
   "./src/core/dates.js",
@@ -39,9 +38,14 @@ const PRECACHE_URLS = [
   "./src/ui/router.js",
   "./src/ui/format.js",
   "./src/ui/download-backup.js",
-  "./src/ui/base.css",
+  "./src/ui/styles/tokens.css",
+  "./src/ui/styles/base.css",
+  "./src/ui/styles/atoms.css",
+  "./src/ui/styles/molecules.css",
+  "./src/ui/styles/organisms.css",
   "./src/ui/components/dom.js",
   "./src/ui/components/big-button.js",
+  "./src/ui/components/card.js",
   "./src/ui/components/step-counter.js",
   "./src/ui/components/heatmap.js",
   "./src/ui/components/lightbox.js",

@@ -11,6 +11,7 @@ import { APP_VERSION } from "../../version.js";
 import { formatDayKeyLong } from "../format.js";
 import { el, clear } from "../components/dom.js";
 import { bigButton } from "../components/big-button.js";
+import { cardHead } from "../components/card.js";
 import { downloadBackup } from "../download-backup.js";
 import { navigate } from "../router.js";
 
@@ -79,7 +80,7 @@ function buildPreferencesCard(ctx, state, ui) {
   const themeSelect = /** @type {HTMLSelectElement} */ (
     el(
       "select",
-      { attrs: { id: "settings-theme" } },
+      { className: "select", attrs: { id: "settings-theme" } },
       Object.entries(THEME_LABELS).map(([value, label]) => el("option", { text: label, attrs: { value } }))
     )
   );
@@ -88,24 +89,24 @@ function buildPreferencesCard(ctx, state, ui) {
   const fontScaleSelect = /** @type {HTMLSelectElement} */ (
     el(
       "select",
-      { attrs: { id: "settings-font-scale" } },
+      { className: "select", attrs: { id: "settings-font-scale" } },
       Object.entries(FONT_SCALE_LABELS).map(([value, label]) => el("option", { text: label, attrs: { value } }))
     )
   );
   fontScaleSelect.value = state.settings.fontScale;
 
   const defaultRepsInput = /** @type {HTMLInputElement} */ (
-    el("input", { attrs: { type: "number", min: "1", id: "settings-default-reps" } })
+    el("input", { className: "input", attrs: { type: "number", min: "1", id: "settings-default-reps" } })
   );
   defaultRepsInput.value = String(state.settings.defaultReps);
 
   const dailyLimitInput = /** @type {HTMLInputElement} */ (
-    el("input", { attrs: { type: "number", min: "1", id: "settings-daily-limit" } })
+    el("input", { className: "input", attrs: { type: "number", min: "1", id: "settings-daily-limit" } })
   );
   dailyLimitInput.value = String(state.settings.dailyReviewLimit);
 
   const backupReminderInput = /** @type {HTMLInputElement} */ (
-    el("input", { className: "checkbox-input", attrs: { type: "checkbox" } })
+    el("input", { className: "checkbox", attrs: { type: "checkbox" } })
   );
   backupReminderInput.checked = state.settings.backupReminderEnabled;
 
@@ -126,21 +127,21 @@ function buildPreferencesCard(ctx, state, ui) {
   }
 
   const children = [
-    el("h1", { text: "الإعدادات" }),
+    cardHead("الإعدادات", { eyebrow: "التفضيلات", level: "h1" }),
     el("div", { className: "field" }, [
-      el("label", { text: "المظهر", attrs: { for: "settings-theme" } }),
+      el("label", { className: "label", text: "المظهر", attrs: { for: "settings-theme" } }),
       themeSelect,
     ]),
     el("div", { className: "field" }, [
-      el("label", { text: "حجم الخط", attrs: { for: "settings-font-scale" } }),
+      el("label", { className: "label", text: "حجم الخط", attrs: { for: "settings-font-scale" } }),
       fontScaleSelect,
     ]),
     el("div", { className: "field" }, [
-      el("label", { text: "عدد التكرارات الافتراضي", attrs: { for: "settings-default-reps" } }),
+      el("label", { className: "label", text: "عدد التكرارات الافتراضي", attrs: { for: "settings-default-reps" } }),
       defaultRepsInput,
     ]),
     el("div", { className: "field" }, [
-      el("label", { text: "الحد الأقصى لمراجعات اليوم", attrs: { for: "settings-daily-limit" } }),
+      el("label", { className: "label", text: "الحد الأقصى لمراجعات اليوم", attrs: { for: "settings-daily-limit" } }),
       dailyLimitInput,
     ]),
     el("div", { className: "field" }, [
@@ -149,7 +150,7 @@ function buildPreferencesCard(ctx, state, ui) {
         el("span", { text: "تذكير النسخ الاحتياطي كل 30 يومًا" }),
       ]),
     ]),
-    el("div", { className: "step-counter__actions" }, [bigButton({ text: "حفظ", onClick: handleSave })]),
+    el("div", { className: "actions actions--inline" }, [bigButton({ text: "حفظ", onClick: handleSave })]),
   ];
 
   if (ui.savedFlash) {
@@ -177,7 +178,7 @@ function buildBackupCard(ctx, state, ui) {
   });
 
   const fileInput = /** @type {HTMLInputElement} */ (
-    el("input", { attrs: { type: "file", accept: "application/json,.json", id: "settings-import-file" } })
+    el("input", { className: "input", attrs: { type: "file", accept: "application/json,.json", id: "settings-import-file" } })
   );
 
   fileInput.addEventListener("change", () => {
@@ -207,14 +208,14 @@ function buildBackupCard(ctx, state, ui) {
   });
 
   const children = [
-    el("h2", { text: "النسخ الاحتياطي والبيانات" }),
+    cardHead("النسخ الاحتياطي والبيانات", { eyebrow: "بياناتك" }),
     el("p", {
       text: "تُخزَّن كل بياناتك محليًا في متصفحك فقط (localStorage) ولا تغادر جهازك إطلاقًا. هذا التخزين قد يُمحى بتنظيف بيانات المتصفح أو التصفح الخفي أو إعادة ضبط الجهاز — النسخ الاحتياطي الدوري هو حمايتك الوحيدة.",
     }),
     el("p", { className: "muted", text: lastBackupText }),
-    el("div", { className: "step-counter__actions" }, [exportButton]),
+    el("div", { className: "actions actions--inline" }, [exportButton]),
     el("div", { className: "field" }, [
-      el("label", { text: "استيراد نسخة احتياطية (يستبدل كل البيانات الحالية)", attrs: { for: "settings-import-file" } }),
+      el("label", { className: "label", text: "استيراد نسخة احتياطية (يستبدل كل البيانات الحالية)", attrs: { for: "settings-import-file" } }),
       fileInput,
     ]),
   ];
@@ -237,12 +238,12 @@ function buildImportConfirm(ctx, ui) {
   const { store, now } = ctx;
   const { pendingImport } = ui;
 
-  return el("div", { className: "card" }, [
+  return el("div", { className: "card card--sunken" }, [
     el("h3", { text: "تأكيد استبدال البيانات" }),
     el("p", {
       text: `سيتم استبدال بياناتك الحالية بالكامل بمحتوى هذا الملف: ${pendingImport.sessionsCount} جلسة، ${pendingImport.reviewCount} عنصر مراجعة، ${pendingImport.mistakesCount} سجل خطأ. سيُصدَّر نسخة من حالتك الحالية تلقائيًا أولًا قبل الاستبدال.`,
     }),
-    el("div", { className: "step-counter__actions" }, [
+    el("div", { className: "actions actions--inline" }, [
       bigButton({
         text: "تأكيد الاستبدال",
         variant: "danger",
@@ -262,7 +263,7 @@ function buildResetSection(ctx, ui) {
   const { store, now } = ctx;
 
   if (!ui.resetConfirming) {
-    return el("div", { className: "step-counter__actions" }, [
+    return el("div", { className: "actions actions--inline" }, [
       bigButton({
         text: "إعادة ضبط التطبيق",
         variant: "danger",
@@ -271,12 +272,12 @@ function buildResetSection(ctx, ui) {
     ]);
   }
 
-  return el("div", { className: "card" }, [
+  return el("div", { className: "card card--sunken" }, [
     el("p", {
       className: "error-text",
       text: "سيُحذف كل شيء — جلساتك ومراجعاتك وأخطاؤك المسجّلة — بلا رجعة. سيُصدَّر نسخة احتياطية تلقائيًا أولًا.",
     }),
-    el("div", { className: "step-counter__actions" }, [
+    el("div", { className: "actions actions--inline" }, [
       bigButton({
         text: "نعم، احذف كل شيء",
         variant: "danger",
@@ -296,7 +297,7 @@ function buildResetSection(ctx, ui) {
 
 function buildAboutCard() {
   return el("section", { className: "card" }, [
-    el("h2", { text: "حول" }),
+    cardHead("حول", { eyebrow: "التطبيق" }),
     el("p", { className: "muted", text: `الإصدار: ${APP_VERSION} · schemaVersion: ${CURRENT_SCHEMA_VERSION}` }),
   ]);
 }

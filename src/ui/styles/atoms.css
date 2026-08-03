@@ -1,0 +1,228 @@
+/**
+ * الطبقة 2 — الذرّات: أصغر وحدات الواجهة القابلة للاستعمال وحدها. كل ذرّة
+ * هنا لا تعرف شيئًا عن مكانها في الصفحة، ولا تحدّد هوامش خارجية لنفسها
+ * (التباعد مسؤولية الحاويات في الطبقتين الأعلى).
+ */
+
+@layer atoms {
+  /* ===== الزرّ ===== */
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-block-size: 44px;
+    min-inline-size: 44px;
+    padding-inline: var(--space-4);
+    border: var(--border-hair) solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    font-family: var(--font-text);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: var(--leading-snug);
+    text-align: center;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-1) var(--ease-out),
+      border-color var(--dur-1) var(--ease-out),
+      color var(--dur-1) var(--ease-out),
+      transform var(--dur-1) var(--ease-out);
+  }
+
+  /* زرّ المراحل الكبير (القسم 6.2): هدف لمس مريح أثناء الحفظ والتكرار،
+     حين تكون العين على المصحف لا على الشاشة. */
+  .btn--lg {
+    min-block-size: 64px;
+    padding-inline: var(--space-5);
+    font-size: var(--text-md);
+  }
+
+  .btn--sm {
+    min-block-size: 36px;
+    min-inline-size: 36px;
+    padding-inline: var(--space-3);
+    font-size: var(--text-xs);
+  }
+
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* الأساسي: لازورد مصمت بإطار داخلي شعري — صدى لازدواج خطّ إطار الصفحة */
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-fg);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
+
+  .btn-secondary {
+    background: var(--surface);
+    border-color: var(--rule-strong);
+    color: var(--fg);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent-text);
+  }
+
+  /* الفعل الخطر ثانويّ بصريًا حتى يُقصَد: حدّ محايد ونصّ بلون الشنجرف،
+     ولا يشتعل الحدّ إلا عند المرور — كي لا يسرق الانتباه من الفعل الأساسي. */
+  .btn-danger {
+    background: transparent;
+    border-color: var(--rule-strong);
+    color: var(--danger-text);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    border-color: var(--danger);
+    background: var(--danger-soft);
+  }
+
+  .btn-ghost {
+    color: var(--fg-muted);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+
+  /* ===== حقول الإدخال ===== */
+
+  .input,
+  .select,
+  .textarea {
+    inline-size: 100%;
+    min-block-size: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-thick) solid var(--rule-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--fg);
+    font-size: var(--text-md);
+    transition:
+      border-color var(--dur-1) var(--ease-out),
+      background-color var(--dur-1) var(--ease-out);
+  }
+
+  .textarea {
+    min-block-size: unset;
+    line-height: var(--leading-snug);
+    resize: vertical;
+  }
+
+  .input:hover,
+  .select:hover,
+  .textarea:hover {
+    border-color: var(--accent);
+  }
+
+  .input:focus-visible,
+  .select:focus-visible,
+  .textarea:focus-visible {
+    border-color: var(--accent);
+    outline: 2px solid var(--focus);
+    outline-offset: 1px;
+  }
+
+  .input::placeholder {
+    color: var(--fg-subtle);
+  }
+
+  /* حقل الملف: زرّ المتصفح الأصلي لا يقبل تنسيقًا موحّدًا عبر المحرّكات،
+     فيُترك على طبيعته وتُنسَّق الحاوية فقط. */
+  .input[type="file"] {
+    padding: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .checkbox {
+    inline-size: 20px;
+    block-size: 20px;
+    flex-shrink: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  /* ===== النصوص المساعدة ===== */
+
+  .muted {
+    color: var(--fg-muted);
+    font-size: var(--text-sm);
+  }
+
+  .error-text {
+    color: var(--danger-text);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .error-text:empty {
+    display: none;
+  }
+
+  /* عنوان فوقي: يسمّي نوع البطاقة قبل عنوانها — ذهبيّ صغير متباعد الحروف،
+     يؤدّي دور «العنوان الجانبي» في هامش المخطوطة. */
+  .eyebrow {
+    font-family: var(--font-text);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    color: var(--ornament-text);
+  }
+
+  /* رقم معروض: يُعزَل اتجاهيًا دائمًا (dir="ltr" في HTML) كي لا تعيد
+     خوارزمية Bidi ترتيب «4 / 10» بصريًا داخل سياق عربي. */
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ===== علامة الربع (الوردة الثمانية) ===== */
+
+  /* العنصر المميّز للهوية: علامة تقسيم الحفظ في هامش المصحف. تُستعمل
+     لثلاثة أدوار فقط — شعار التطبيق، ودالّ الصفحة الحالية في الهامش،
+     وحصى عدّاد التكرار. أي استعمال رابع يُفقدها معناها. */
+  .rosette {
+    inline-size: 1rem;
+    block-size: 1rem;
+    flex-shrink: 0;
+    color: var(--ornament);
+  }
+
+  /* ===== فواصل ===== */
+
+  /* خطّ شعري يملأ ما تبقّى من السطر بعد عنوان — إطار الصفحة لا صندوق حولها.
+     على الهاتف تلتفّ العناوين الطويلة فلا يبقى للخطّ إلا شُرطة تائهة في
+     آخر السطر — فيُحذَف هناك: زخرفةٌ لا تعمل إلا حين يتّسع لها السطر. */
+  .rule-fill {
+    display: none;
+    flex: 1;
+    block-size: var(--border-hair);
+    background: var(--rule);
+    min-inline-size: var(--space-6);
+  }
+
+  @media (min-width: 48rem) {
+    .rule-fill {
+      display: block;
+    }
+  }
+}

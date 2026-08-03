@@ -1,0 +1,282 @@
+/**
+ * الطبقة 0 — الذرّات الأولى: الخطوط والرموز التصميمية (tokens).
+ *
+ * الهوية: صفحة مصحف. الورق المُصفرّ قليلًا سطحٌ، والحبر نصّ، واللازورد
+ * (أزرق المخطوطات) هو لون التفاعل، والذهب زخرفة العلامات وحدها، والشنجرف
+ * (الأحمر الترابي) للخطر والخطأ فقط. لا لون سادس.
+ *
+ * الرموز على مستويين: قيم خام (--c-*, --space-*) لا تُستعمل في المكوّنات
+ * مباشرة، ورموز دلالية (--bg, --fg, --accent) هي وحدها ما تشير إليه
+ * الطبقات الأعلى — فتبديل السمة يتم بإعادة ربط الطبقة الدلالية فقط.
+ */
+
+@layer tokens, base, atoms, molecules, organisms;
+
+/* ===== الخطوط ===== */
+
+/* خط العناوين: Reem Kufi — كوفي معاصر مستوحى من عناوين السور المزخرفة في
+   المصاحف. ملف واحد متغيّر الوزن (400–700) وللنطاق العربي فقط: الأرقام
+   والحروف اللاتينية تسقط تلقائيًا إلى IBM Plex Sans Arabic، وهو تجاور
+   مقصود — الأرقام الهندسية تناسب الكوفي الهندسي. */
+@font-face {
+  font-family: "Reem Kufi";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../../../assets/fonts/reemkufi-var-arabic.woff2") format("woff2-variations");
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC;
+}
+
+/* خط النصّ: IBM Plex Sans Arabic بوزنين فقط (عادي وشبه عريض) — الحدّ الذي
+   يكفي لتراتب واضح دون تضخيم ميزانية الخطوط. */
+@font-face {
+  font-family: "Plex Arabic";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../../assets/fonts/plex-400-arabic.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC;
+}
+@font-face {
+  font-family: "Plex Arabic";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../../assets/fonts/plex-400-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+2000-206F, U+2212;
+}
+@font-face {
+  font-family: "Plex Arabic";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../../../assets/fonts/plex-600-arabic.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC;
+}
+@font-face {
+  font-family: "Plex Arabic";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../../../assets/fonts/plex-600-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+2000-206F, U+2212;
+}
+
+@layer tokens {
+  :root {
+    /* ===== القيم الخام: الألوان ===== */
+
+    /* الحبر والورق */
+    --c-ink-900: #14130f;
+    --c-ink-700: #2f2b23;
+    --c-ink-500: #5c5548;
+    --c-ink-400: #7a7263;
+    --c-paper-50: #fdfbf6;
+    --c-paper-100: #f5f1e7;
+    --c-paper-200: #ebe5d6;
+    --c-paper-300: #ddd4bf;
+    --c-paper-400: #c7bda4;
+
+    /* الليل: حبر أزرق داكن لا رمادي محايد */
+    --c-night-900: #0e1117;
+    --c-night-800: #151a22;
+    --c-night-700: #1c222c;
+    --c-night-600: #29313d;
+    --c-night-500: #3b4553;
+
+    /* اللازورد — لون التفاعل */
+    --c-lapis-700: #16396a;
+    --c-lapis-600: #1d4d88;
+    --c-lapis-500: #2a63a8;
+    --c-lapis-300: #7ea7dd;
+    --c-lapis-200: #a8c5ea;
+
+    /* الذهب — الزخرفة والعلامة والإنجاز */
+    --c-gold-700: #7a5a12;
+    --c-gold-600: #97711a;
+    --c-gold-500: #b8892a;
+    --c-gold-400: #d3aa50;
+    --c-gold-300: #e4c684;
+
+    /* الشنجرف — الخطر والخطأ */
+    --c-verm-700: #8d2a19;
+    --c-verm-600: #a63421;
+    --c-verm-400: #d9705a;
+    --c-verm-300: #eb907c;
+
+    /* ===== القيم الخام: المقاييس ===== */
+
+    /* سلّم المسافات: أساس 0.25rem، تضاعف تدريجي */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --space-8: 4rem;
+
+    /* سلّم الأحجام الطباعية (نسبة ≈1.25) */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-md: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.375rem;
+    --text-2xl: 1.75rem;
+    --text-3xl: 2.25rem;
+    --text-4xl: 3rem;
+
+    --leading-tight: 1.25;
+    --leading-snug: 1.45;
+    --leading-normal: 1.7;
+
+    --tracking-wide: 0.06em;
+
+    /* الأنصاف الأقطار: عالم المصحف مستقيم الحواف — أنصاف أقطار صغيرة */
+    --radius-xs: 2px;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 10px;
+    --radius-full: 999px;
+
+    --border-hair: 1px;
+    --border-thick: 1.5px;
+
+    /* الحركة */
+    --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --dur-1: 120ms;
+    --dur-2: 200ms;
+    --dur-3: 420ms;
+
+    /* الهيكل */
+    --rail-width: 15rem;
+    --page-max: 78rem;
+    --measure: 46rem;
+
+    --z-sticky: 5;
+    --z-banner: 50;
+
+    /* ===== الطبقة الدلالية — الوضع النهاري (افتراضي) ===== */
+    color-scheme: light dark;
+  }
+
+  /* النهار: لوح مُصفرّ خافت خلفيةً، وورق أفتح منه للبطاقات — انعكاس مقصود
+     لعادة «خلفية رمادية + بطاقة بيضاء»: هنا البطاقة صفحة على لوح. */
+  :root,
+  :root[data-theme="light"] {
+    --bg: var(--c-paper-100);
+    --surface: var(--c-paper-50);
+    --surface-sunken: var(--c-paper-200);
+    --fg: var(--c-ink-900);
+    --fg-muted: var(--c-ink-500);
+    --fg-subtle: var(--c-ink-400);
+
+    --rule: var(--c-paper-300);
+    --rule-strong: var(--c-paper-400);
+
+    --accent: var(--c-lapis-600);
+    --accent-strong: var(--c-lapis-700);
+    --accent-fg: #ffffff;
+    --accent-text: var(--c-lapis-700);
+    --accent-soft: color-mix(in srgb, var(--c-lapis-600) 9%, transparent);
+
+    --ornament: var(--c-gold-500);
+    --ornament-text: var(--c-gold-700);
+    --ornament-soft: color-mix(in srgb, var(--c-gold-500) 16%, transparent);
+
+    --danger: var(--c-verm-600);
+    --danger-text: var(--c-verm-700);
+    --danger-soft: color-mix(in srgb, var(--c-verm-600) 10%, transparent);
+
+    --focus: var(--c-lapis-600);
+
+    --shadow-1: 0 1px 2px rgba(20, 19, 15, 0.06);
+    --shadow-2: 0 12px 32px -16px rgba(20, 19, 15, 0.35);
+  }
+
+  /* الليل: حبر أزرق داكن بدل الأسود المحايد، ونصّ بلون الورق لا أبيض ناصع */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: var(--c-night-900);
+      --surface: var(--c-night-800);
+      --surface-sunken: var(--c-night-700);
+      --fg: #eae4d6;
+      --fg-muted: #a49b88;
+      --fg-subtle: #8b8371;
+
+      --rule: var(--c-night-600);
+      --rule-strong: var(--c-night-500);
+
+      --accent: var(--c-lapis-500);
+      --accent-strong: var(--c-lapis-600);
+      --accent-fg: #ffffff;
+      --accent-text: var(--c-lapis-300);
+      --accent-soft: color-mix(in srgb, var(--c-lapis-300) 14%, transparent);
+
+      --ornament: var(--c-gold-400);
+      --ornament-text: var(--c-gold-300);
+      --ornament-soft: color-mix(in srgb, var(--c-gold-400) 18%, transparent);
+
+      --danger: var(--c-verm-400);
+      --danger-text: var(--c-verm-300);
+      --danger-soft: color-mix(in srgb, var(--c-verm-400) 14%, transparent);
+
+      --focus: var(--c-lapis-300);
+
+      --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-2: 0 12px 32px -16px rgba(0, 0, 0, 0.7);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: var(--c-night-900);
+    --surface: var(--c-night-800);
+    --surface-sunken: var(--c-night-700);
+    --fg: #eae4d6;
+    --fg-muted: #a49b88;
+    --fg-subtle: #8b8371;
+
+    --rule: var(--c-night-600);
+    --rule-strong: var(--c-night-500);
+
+    --accent: var(--c-lapis-500);
+    --accent-strong: var(--c-lapis-600);
+    --accent-fg: #ffffff;
+    --accent-text: var(--c-lapis-300);
+    --accent-soft: color-mix(in srgb, var(--c-lapis-300) 14%, transparent);
+
+    --ornament: var(--c-gold-400);
+    --ornament-text: var(--c-gold-300);
+    --ornament-soft: color-mix(in srgb, var(--c-gold-400) 18%, transparent);
+
+    --danger: var(--c-verm-400);
+    --danger-text: var(--c-verm-300);
+    --danger-soft: color-mix(in srgb, var(--c-verm-400) 14%, transparent);
+
+    --focus: var(--c-lapis-300);
+
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 12px 32px -16px rgba(0, 0, 0, 0.7);
+  }
+
+  /* عائلات الخطوط — دلالية أيضًا: عنوان، نصّ، وأرقام (بأرقام جدولية
+     ثابتة العرض كي لا يهتزّ العدّاد بين 9 و10). */
+  :root {
+    --font-display: "Reem Kufi", "Plex Arabic", system-ui, sans-serif;
+    --font-text: "Plex Arabic", system-ui, sans-serif;
+  }
+
+  /* حجم الخط الأساسي — إعداد المستخدم (القسم 12) */
+  :root[data-font-scale="sm"] {
+    font-size: 14px;
+  }
+  :root[data-font-scale="md"] {
+    font-size: 16px;
+  }
+  :root[data-font-scale="lg"] {
+    font-size: 18px;
+  }
+  :root[data-font-scale="xl"] {
+    font-size: 20px;
+  }
+}

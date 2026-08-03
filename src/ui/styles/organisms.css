@@ -1,0 +1,304 @@
+/**
+ * الطبقة 4 — الأعضاء والهيكل: الشريط الجانبي، والعمود الرئيسي، والشاشات
+ * المركّبة (خريطة النشاط، معرض الخرائط)، ونقاط التوقّف.
+ *
+ * استعارة الهيكل: صفحة مصحف. الهامش الأيمن شريطٌ ثابت يحمل الشعار
+ * والتنقّل، ويفصله عن النصّ خطّان شعريّان متوازيان — إطار الصفحة نفسه.
+ */
+
+@layer organisms {
+  #app {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-inline-size: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--space-4);
+    padding-block: var(--space-4) var(--space-8);
+  }
+
+  /* ===== الشريط الجانبي ===== */
+
+  .app-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .app-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .app-header__mark {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    flex-shrink: 0;
+    color: var(--ornament);
+  }
+
+  .app-header__text {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+
+  .app-header__title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+  }
+
+  .app-header__subtitle {
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+  }
+
+  /* التنقّل: شريط أفقي قابل للتمرير على الهاتف، عمود في الهامش على اللابتوب */
+  .app-nav {
+    display: flex;
+    gap: var(--space-1);
+    overflow-x: auto;
+    padding-block: var(--space-2);
+    border-block-end: var(--border-hair) solid var(--rule);
+    scrollbar-width: none;
+    /* تلاشٍ عند الحافتين: دلالة على أن الشريط يمتدّ أبعد مما يظهر */
+    mask-image: linear-gradient(to left, transparent, black 2rem, black calc(100% - 2rem), transparent);
+  }
+
+  .app-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* علامة الربع تظهر في الهامش على اللابتوب فقط؛ على الهاتف الشريط أفقي
+     ضيّق فتكفي فيه تعبئة الخلفية للدلالة على الصفحة الحالية. */
+  .app-nav .nav-btn__marker {
+    display: none;
+  }
+
+  /* حالة اليوم: التتابع — معلومة صحيحة في كل الصفحات، فمكانها الهامش
+     لا رأس كل شاشة. */
+  .app-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  /* ===== العمود الرئيسي ===== */
+
+  .app-main {
+    min-inline-size: 0;
+  }
+
+  .view {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-inline-size: 54rem;
+  }
+
+  .view > h1 {
+    font-size: var(--text-2xl);
+  }
+
+  /* عنوان الشاشة مع خطّه الشعري (المحاذاة كما في .card__head) */
+  .view__head {
+    display: flex;
+    align-items: center;
+    align-items: last baseline;
+    gap: var(--space-3);
+    padding-block-end: var(--space-1);
+  }
+
+  .view-maps {
+    max-inline-size: none;
+  }
+
+  /* ظهور هادئ عند تبديل الشاشة — لا حركة عند تفضيل تقليلها (الطبقة base).
+     الحركة إزاحةٌ فقط بلا تعتيم: التعتيم يخفض التباين الفعلي طوال مدّته،
+     فيصير النصّ لحظتَها دون حدّ WCAG — وهي لحظة يقرأ فيها المستخدم فعلًا. */
+  .view {
+    animation: view-in var(--dur-2) var(--ease-out);
+  }
+
+  @keyframes view-in {
+    from {
+      transform: translateY(6px);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  /* ===== خريطة النشاط ===== */
+
+  .heatmap-scroll {
+    overflow-x: auto;
+    padding-block-end: var(--space-1);
+  }
+
+  .heatmap {
+    display: flex;
+    gap: 3px;
+    inline-size: max-content;
+  }
+
+  .heatmap__week {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .heatmap__cell {
+    inline-size: 11px;
+    block-size: 11px;
+    border-radius: var(--radius-xs);
+    background: var(--surface-sunken);
+  }
+
+  .heatmap__cell--1 {
+    background: color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+
+  .heatmap__cell--2 {
+    background: color-mix(in srgb, var(--accent) 65%, transparent);
+  }
+
+  .heatmap__cell--3 {
+    background: var(--accent);
+  }
+
+  .heatmap__legend {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-block-start: var(--space-3);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+  }
+
+  /* ===== معرض الخرائط الذهنية ===== */
+
+  .maps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .maps-grid figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .maps-grid figcaption {
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--fg-muted);
+  }
+
+  .map-thumb {
+    display: block;
+    inline-size: 100%;
+    padding: var(--space-1);
+    border: var(--border-hair) solid var(--rule);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-1) var(--ease-out),
+      transform var(--dur-1) var(--ease-out);
+  }
+
+  .map-thumb:hover {
+    border-color: var(--ornament);
+    transform: translateY(-2px);
+  }
+
+  .map-thumb img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    border-radius: var(--radius-xs);
+  }
+
+  /* ===== نقطة التوقّف: تابلت فأعلى ===== */
+
+  @media (min-width: 48rem) {
+    #app {
+      padding-block-start: var(--space-6);
+      gap: var(--space-5);
+    }
+
+    .app-header__title {
+      font-size: var(--text-2xl);
+    }
+
+    .view {
+      gap: var(--space-5);
+    }
+  }
+
+  /* ===== نقطة التوقّف: لابتوب فأعلى — هامش ثابت وإطار صفحة ===== */
+
+  @media (min-width: 64rem) {
+    #app {
+      display: grid;
+      grid-template-columns: var(--rail-width) minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-7);
+      padding-block-start: var(--space-7);
+    }
+
+    .app-sidebar {
+      position: sticky;
+      inset-block-start: var(--space-6);
+      gap: var(--space-6);
+      padding-inline-end: var(--space-5);
+    }
+
+    /* خطّا الإطار: الخارجي على حافة الهامش والداخلي بعده بثلاث بكسلات —
+       ازدواج خطّ إطار صفحة المصحف. */
+    .app-sidebar::before,
+    .app-sidebar::after {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      inline-size: var(--border-hair);
+      background: var(--rule);
+    }
+
+    .app-sidebar::before {
+      inset-inline-end: 0;
+    }
+
+    .app-sidebar::after {
+      inset-inline-end: 3px;
+      background: var(--rule-strong);
+    }
+
+    .app-nav {
+      flex-direction: column;
+      overflow-x: visible;
+      padding-block: 0;
+      border-block-end: none;
+      mask-image: none;
+    }
+
+    .app-nav .nav-btn__marker {
+      display: block;
+    }
+
+    .app-status {
+      flex-direction: column;
+      align-items: flex-start;
+      padding-block-start: var(--space-4);
+      border-block-start: var(--border-hair) solid var(--rule);
+    }
+  }
+}

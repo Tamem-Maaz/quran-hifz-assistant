@@ -17,6 +17,7 @@ import { computeProgressPercentage, estimateCompletionDayKey, TOTAL_AYAHS } from
 import { formatDayKeyLong } from "../format.js";
 import { el, clear } from "../components/dom.js";
 import { bigButton } from "../components/big-button.js";
+import { cardHead } from "../components/card.js";
 import { activityHeatmap } from "../components/heatmap.js";
 
 /** @typedef {import('../store.js').AppContext} AppContext */
@@ -49,7 +50,10 @@ function build(ctx) {
   const todayKey = toDayKey(new Date(now()));
 
   return el("div", { className: "view view-stats" }, [
-    el("h1", { text: "الإحصائيات" }),
+    el("header", { className: "view__head" }, [
+      el("h1", { text: "الإحصائيات" }),
+      el("span", { className: "rule-fill" }),
+    ]),
     buildStreakCard(state, todayKey),
     buildProgressCard(state, todayKey),
     buildGoalCard(ctx, state),
@@ -70,18 +74,26 @@ function buildStreakCard(state, todayKey) {
         : "استمر — كل يوم نشاط (سبق أو مراجعة) يحافظ على التتابع.";
 
   return el("section", { className: "card" }, [
-    el("h2", { text: "التتابع" }),
+    cardHead("التتابع", { eyebrow: "الاستمرار" }),
     el("div", { className: "stat-grid" }, [
-      el("div", { className: "stat-tile" }, [
-        el("span", { className: "stat-tile__value", text: String(current) }),
-        el("span", { className: "muted", text: "الحالي" }),
-      ]),
-      el("div", { className: "stat-tile" }, [
-        el("span", { className: "stat-tile__value", text: String(longest) }),
-        el("span", { className: "muted", text: "الأطول" }),
-      ]),
+      statTile(String(current), "يومًا متتاليًا", "gold"),
+      statTile(String(longest), "أطول تتابع"),
     ]),
     el("p", { className: "muted", text: message }),
+  ]);
+}
+
+/**
+ * بلاطة إحصائية: رقم كبير وتسمية تحته. التسمية تصف الوحدة لا تعيد العنوان.
+ * @param {string} value
+ * @param {string} label
+ * @param {'gold'|'accent'} [tone]
+ * @returns {HTMLElement}
+ */
+function statTile(value, label, tone) {
+  return el("div", { className: `stat${tone ? ` stat--${tone}` : ""}` }, [
+    el("span", { className: "stat__value", attrs: { dir: "ltr" }, text: value }),
+    el("span", { className: "stat__label", text: label }),
   ]);
 }
 
@@ -91,16 +103,10 @@ function buildProgressCard(state, todayKey) {
   const estimate = estimateCompletionDayKey(state.sessions, todayKey);
 
   return el("section", { className: "card" }, [
-    el("h2", { text: "التقدّم" }),
+    cardHead("التقدّم", { eyebrow: "الحصيلة" }),
     el("div", { className: "stat-grid" }, [
-      el("div", { className: "stat-tile" }, [
-        el("span", { className: "stat-tile__value", text: String(memorized) }),
-        el("span", { className: "muted", text: `آية من ${TOTAL_AYAHS}` }),
-      ]),
-      el("div", { className: "stat-tile" }, [
-        el("span", { className: "stat-tile__value", text: `${percentage.toFixed(1)}%` }),
-        el("span", { className: "muted", text: "من كتاب الله" }),
-      ]),
+      statTile(String(memorized), `آية من ${TOTAL_AYAHS}`, "accent"),
+      statTile(`${percentage.toFixed(1)}%`, "من كتاب الله"),
     ]),
     el("p", {
       className: "muted",
@@ -117,9 +123,9 @@ function buildGoalCard(ctx, state) {
 
   if (goal) {
     return el("section", { className: "card" }, [
-      el("h2", { text: "الهدف اليومي" }),
+      cardHead("الهدف اليومي", { eyebrow: "الالتزام" }),
       el("p", { text: `${goal.ayahsPerDay} آية في اليوم` }),
-      el("div", { className: "step-counter__actions" }, [
+      el("div", { className: "actions actions--inline" }, [
         bigButton({
           text: "إلغاء الهدف",
           variant: "secondary",
@@ -130,18 +136,21 @@ function buildGoalCard(ctx, state) {
   }
 
   const input = /** @type {HTMLInputElement} */ (
-    el("input", { attrs: { type: "number", min: "1", inputmode: "numeric", id: "goal-ayahs-per-day" } })
+    el("input", {
+      className: "input",
+      attrs: { type: "number", min: "1", inputmode: "numeric", id: "goal-ayahs-per-day" },
+    })
   );
   input.value = "5";
 
   return el("section", { className: "card" }, [
-    el("h2", { text: "الهدف اليومي" }),
+    cardHead("الهدف اليومي", { eyebrow: "الالتزام" }),
     el("p", { className: "muted", text: "اختياري — عدد الآيات التي تنوي حفظها يوميًا." }),
     el("div", { className: "field" }, [
-      el("label", { text: "آيات في اليوم", attrs: { for: "goal-ayahs-per-day" } }),
+      el("label", { className: "label", text: "آيات في اليوم", attrs: { for: "goal-ayahs-per-day" } }),
       input,
     ]),
-    el("div", { className: "step-counter__actions" }, [
+    el("div", { className: "actions actions--inline" }, [
       bigButton({
         text: "تعيين الهدف",
         onClick: () => {
@@ -158,10 +167,17 @@ function buildStepTotalsCard(state) {
   const totals = computeStepTotals(state.sessions);
 
   return el("section", { className: "card" }, [
-    el("h2", { text: "إجماليات الخطوات" }),
+    cardHead("إجماليات الخطوات", { eyebrow: "العمل المبذول" }),
     el("p", { text: `الجلسات المكتملة: ${countCompletedSessions(state.sessions)}` }),
-    ...Object.entries(STEP_LABELS).map(([key, label]) =>
-      el("p", { className: "muted", text: `${label}: ${totals[key]}` })
+    el(
+      "div",
+      {},
+      Object.entries(STEP_LABELS).map(([key, label]) =>
+        el("div", { className: "row" }, [
+          el("span", { className: "row__label", text: label }),
+          el("span", { className: "num muted", attrs: { dir: "ltr" }, text: String(totals[key]) }),
+        ])
+      )
     ),
   ]);
 }
@@ -171,7 +187,7 @@ function buildMistakesCard(state, surahs) {
 
   if (top.length === 0) {
     return el("section", { className: "card" }, [
-      el("h2", { text: "أكثر المواضع تعثّرًا" }),
+      cardHead("أكثر المواضع تعثّرًا", { eyebrow: "ما يحتاج تثبيتًا" }),
       el("p", { className: "muted", text: "لا أخطاء مسجّلة بعد." }),
     ]);
   }
@@ -179,19 +195,22 @@ function buildMistakesCard(state, surahs) {
   const rows = top.map((spot) => {
     const surah = surahs.find((s) => s.id === spot.surah);
     const name = surah ? surah.name : `سورة ${spot.surah}`;
-    return el("div", { className: "mistake-spot-row" }, [
-      el("span", { text: `${name} ${spot.ayah}` }),
-      el("span", { className: "muted", text: `${spot.count} مرة` }),
+    return el("div", { className: "row" }, [
+      el("span", { className: "row__label", text: `${name} ${spot.ayah}` }),
+      el("span", { className: "badge", text: `${spot.count} مرة` }),
     ]);
   });
 
-  return el("section", { className: "card" }, [el("h2", { text: "أكثر المواضع تعثّرًا" }), ...rows]);
+  return el("section", { className: "card" }, [
+    cardHead("أكثر المواضع تعثّرًا", { eyebrow: "ما يحتاج تثبيتًا" }),
+    el("div", {}, rows),
+  ]);
 }
 
 function buildHeatmapCard(state, todayKey) {
   const days = buildActivityHeatmap(state.sessions, state.reviewQueue, todayKey, 365);
   return el("section", { className: "card" }, [
-    el("h2", { text: "خريطة النشاط (آخر 365 يومًا)" }),
+    cardHead("خريطة النشاط (آخر 365 يومًا)", { eyebrow: "السنة كاملة" }),
     activityHeatmap(days),
   ]);
 }

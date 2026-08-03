@@ -7,11 +7,34 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; img-src 'self' data:; font-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self';"
     />
-    <meta name="theme-color" content="#4f46e5" />
+    <meta name="theme-color" content="#f5f1e7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1117" media="(prefers-color-scheme: dark)" />
     <title>المساعد بحفظ القرآن الكريم</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="src/ui/base.css" />
+    <!-- خطّا الهوية على مسار الرسم الحرج: تحميلهما مسبقًا يمنع وميض الخط
+         البديل في أول زيارة (الباقي يأتي من ذاكرة Service Worker). -->
+    <link
+      rel="preload"
+      href="assets/fonts/reemkufi-var-arabic.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="assets/fonts/plex-400-arabic.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <!-- طبقات نظام التصميم بترتيب ذرّي: رموز ← أساس ← ذرّات ← جزيئات ← أعضاء.
+         الترتيب معلَن بـ @layer في tokens.css فلا يعتمد على ترتيب الوسوم. -->
+    <link rel="stylesheet" href="src/ui/styles/tokens.css" />
+    <link rel="stylesheet" href="src/ui/styles/base.css" />
+    <link rel="stylesheet" href="src/ui/styles/atoms.css" />
+    <link rel="stylesheet" href="src/ui/styles/molecules.css" />
+    <link rel="stylesheet" href="src/ui/styles/organisms.css" />
   </head>
   <body>
     <div id="app" aria-live="polite"></div>

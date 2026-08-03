@@ -34,9 +34,13 @@ function build(ctx) {
   if (items.length === 0) {
     return el("div", { className: "view view-review" }, [
       el("section", { className: "card" }, [
-        el("h1", { text: "لا مراجعات مستحقة الآن" }),
-        el("div", { className: "step-counter__actions" }, [
-          bigButton({ text: "العودة إلى اليوم", onClick: () => navigate("today") }),
+        el("div", { className: "card__head" }, [
+          el("h1", { text: "لا مراجعات مستحقة الآن" }),
+          el("span", { className: "rule-fill" }),
+        ]),
+        el("p", { className: "muted", text: "كل ما جدولته أُنجز في وقته. عُد حين يحين موعد المقطع التالي." }),
+        el("div", { className: "actions actions--inline" }, [
+          bigButton({ text: "العودة إلى اليوم", onClick: () => navigate("today"), variant: "secondary" }),
         ]),
       ]),
     ]);
@@ -45,10 +49,15 @@ function build(ctx) {
   const rows = items.map((item) => buildReviewRow(item, ctx, todayKey));
 
   return el("div", { className: "view view-review" }, [
-    el("header", { className: "card" }, [el("h1", { text: `المراجعة المستحقة (${items.length})` })]),
+    el("header", { className: "view__head" }, [
+      el("h1", { text: `المراجعة المستحقة (${items.length})` }),
+      el("span", { className: "rule-fill" }),
+    ]),
     ...rows,
   ]);
 }
+
+const TIER_LABELS = { sabqi: "سبقي", manzil: "منزل", graduated: "متخرّج" };
 
 function buildReviewRow(item, ctx, todayKey) {
   const { store, surahs } = ctx;
@@ -59,19 +68,23 @@ function buildReviewRow(item, ctx, todayKey) {
     store.setState({ ...state, reviewQueue: nextQueue });
   }
 
-  const children = [
-    el("h2", { className: "portion-badge", text: formatPortion(item.portion, surahs) }),
-    el("p", { className: "muted", text: item.tier === "sabqi" ? "سبقي" : item.tier === "manzil" ? "منزل" : "متخرّج" }),
-  ];
+  const meta = el("div", { className: "card__eyebrow" }, [
+    el("p", { className: "muted", text: TIER_LABELS[item.tier] ?? item.tier }),
+    el("h2", { className: "portion", text: formatPortion(item.portion, surahs) }),
+  ]);
+
+  const children = [meta];
 
   if (needsReinforcement(item)) {
-    children.push(el("p", { className: "error-text", text: "يحتاج إعادة تثبيت (تكرر إخفاقه)" }));
+    children.push(
+      el("p", { className: "badge badge--danger", text: "يحتاج إعادة تثبيت (تكرر إخفاقه)" })
+    );
   }
 
   children.push(
-    el("div", { className: "step-counter__actions" }, [
-      bigButton({ text: "نجحت", onClick: () => applyOutcome("passed") }),
-      bigButton({ text: "لم أنجح", variant: "secondary", onClick: () => applyOutcome("failed") }),
+    el("div", { className: "actions" }, [
+      bigButton({ text: "نجحت", onClick: () => applyOutcome("passed"), size: "lg" }),
+      bigButton({ text: "لم أنجح", variant: "secondary", size: "lg", onClick: () => applyOutcome("failed") }),
     ])
   );
 

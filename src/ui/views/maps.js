@@ -20,6 +20,11 @@ export function render(container, ctx) {
     text: `متوفرة حاليًا لـ ${maps.length} من 114 سورة — تُضاف الباقي تباعًا. اضغط أي خريطة لتكبيرها.`,
   });
 
+  const head = el("header", { className: "view__head" }, [
+    el("h1", { text: "الخرائط الذهنية" }),
+    el("span", { className: "rule-fill" }),
+  ]);
+
   const grid = el(
     "div",
     { className: "maps-grid" },
@@ -34,7 +39,7 @@ export function render(container, ctx) {
       const thumbButton = el(
         "button",
         {
-          className: "map-thumb-button",
+          className: "map-thumb",
           attrs: { type: "button", "aria-label": `تكبير الخريطة الذهنية لسورة ${name}` },
           onClick: () => openImageLightbox({ src, alt, triggerElement: thumbButton }),
         },
@@ -45,7 +50,5 @@ export function render(container, ctx) {
   );
 
   clear(container);
-  container.append(
-    el("div", { className: "view view-maps" }, [el("h1", { text: "الخرائط الذهنية" }), intro, grid])
-  );
+  container.append(el("div", { className: "view view-maps" }, [head, intro, grid]));
 }

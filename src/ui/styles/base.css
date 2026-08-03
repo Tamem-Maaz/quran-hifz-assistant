@@ -1,0 +1,100 @@
+/**
+ * الطبقة 1 — الأساس: تصفير، عناصر HTML العارية، والقواعد الطباعية العامة.
+ * لا أصناف هنا إطلاقًا: كل ما في هذا الملف ينطبق على العنصر نفسه.
+ */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-text);
+    font-size: var(--text-md);
+    line-height: var(--leading-normal);
+    /* تقريب الحروف العربية في المتصفحات المبنية على WebKit — بلا هذا يبدو
+       Plex العربي أثقل مما ينبغي على الورق الفاتح. */
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    /* الكوفي عريض بطبعه: تضييق طفيف يمنع العناوين من التمدّد المفرط */
+    letter-spacing: -0.01em;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+  }
+  h2 {
+    font-size: var(--text-xl);
+  }
+  h3 {
+    font-size: var(--text-lg);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  hr {
+    border: none;
+    border-block-start: var(--border-hair) solid var(--rule);
+    margin-block: var(--space-2);
+  }
+
+  /* الأرقام جدولية في كل مكان: العدّادات والإحصائيات لا تهتزّ عند التغيّر */
+  :is(input, select, textarea, button, .num) {
+    font-feature-settings: "tnum" 1;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  svg {
+    display: block;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

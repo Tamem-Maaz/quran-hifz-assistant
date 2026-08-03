@@ -1,16 +1,36 @@
 import { svgEl } from "./dom.js";
 
+/** رؤوس النجمة الثمانية (مربّعان متقاطعان) داخل مربّع 100×100. */
+const STAR_POINTS =
+  "50.00,8.00 56.70,33.83 79.70,20.30 66.17,43.30 92.00,50.00 66.17,56.70 79.70,79.70 56.70,66.17 50.00,92.00 43.30,66.17 20.30,79.70 33.83,56.70 8.00,50.00 33.83,43.30 20.30,20.30 43.30,33.83";
+
 /**
  * العلامة الهندسية: نجمة ثمانية بنمط "رُبع الحزب" — علامة تقسيم الحفظ
  * التقليدية في هوامش المصحف. العنصر المميّز الوحيد للهوية البصرية.
  * @param {string} [className]
  * @returns {SVGElement}
  */
-export function brandMark(className = "brand-mark") {
+export function brandMark(className = "app-header__mark") {
   return svgEl("svg", { viewBox: "0 0 100 100", class: className, "aria-hidden": "true", focusable: "false" }, [
-    svgEl("polygon", {
-      points:
-        "50.00,8.00 56.70,33.83 79.70,20.30 66.17,43.30 92.00,50.00 66.17,56.70 79.70,79.70 56.70,66.17 50.00,92.00 43.30,66.17 20.30,79.70 33.83,56.70 8.00,50.00 33.83,43.30 20.30,20.30 43.30,33.83",
+    svgEl("polygon", { points: STAR_POINTS, fill: "currentColor" }),
+  ]);
+}
+
+/**
+ * علامة الربع المفرَّغة: النجمة ذاتها بثقب دائري في وسطها (fill-rule="evenodd"
+ * يحفر المسار الثاني من الأول) — الشكل المرسوم في هامش المصحف عند كل ربع حزب.
+ * تُستعمل دالًّا على الصفحة الحالية في الهامش، وحصاةً في عدّاد التكرار.
+ * @param {string} [className]
+ * @returns {SVGElement}
+ */
+export function rosette(className = "rosette") {
+  const star = STAR_POINTS.split(" ")
+    .map((pair, index) => `${index === 0 ? "M" : "L"}${pair.replace(",", " ")}`)
+    .join(" ");
+  return svgEl("svg", { viewBox: "0 0 100 100", class: className, "aria-hidden": "true", focusable: "false" }, [
+    svgEl("path", {
+      d: `${star} Z M37 50 a13 13 0 1 0 26 0 a13 13 0 1 0 -26 0 Z`,
+      "fill-rule": "evenodd",
       fill: "currentColor",
     }),
   ]);
