@@ -18,6 +18,7 @@ export default [
         TextEncoder: "readonly",
         URL: "readonly",
         Blob: "readonly",
+        requestAnimationFrame: "readonly",
       },
     },
     rules: {
@@ -49,6 +50,6 @@ export default [
     },
   },
   {
-    ignores: ["node_modules/**", "coverage/**", "dist/**", "src/data/surahs.json"],
+    ignores: ["node_modules/**", "coverage/**", "dist/**", "src/data/surahs.json", "src/data/maps.json"],
   },
 ];

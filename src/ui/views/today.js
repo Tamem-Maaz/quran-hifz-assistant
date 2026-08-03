@@ -39,7 +39,7 @@ function build(ctx) {
   const openSession = findOpenSession(state.sessions);
   const hasAnySessions = state.sessions.length > 0;
   const completedToday = state.sessions.some((s) => s.status === "completed" && s.dayKey === todayKey);
-  const { current: streak } = computeStreak(state.sessions, todayKey);
+  const { current: streak } = computeStreak(state.sessions, state.reviewQueue, todayKey);
   const { items: dueItems, overflowCount } = getDueItems(state.reviewQueue, todayKey, state.settings.dailyReviewLimit);
 
   const header = el("header", { className: "card" }, [

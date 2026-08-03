@@ -3,7 +3,15 @@
  * أي مسار غير معروف يُوجَّه إلى لوحة اليوم بدل تمريره كما هو.
  */
 
-export const ROUTES = /** @type {const} */ (["today", "new-session", "session", "review", "settings"]);
+export const ROUTES = /** @type {const} */ ([
+  "today",
+  "new-session",
+  "session",
+  "review",
+  "stats",
+  "maps",
+  "settings",
+]);
 export const DEFAULT_ROUTE = "today";
 
 /** @typedef {typeof ROUTES[number]} Route */

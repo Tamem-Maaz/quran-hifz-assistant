@@ -19,6 +19,7 @@
  * @typedef {Object} AppContext
  * @property {Store} store
  * @property {{id:number, name:string, ayahCount:number, type:string, juz:number[]}[]} surahs
+ * @property {{surah:number, fileName:string, width:number, height:number}[]} maps
  * @property {() => number} now
  */
 

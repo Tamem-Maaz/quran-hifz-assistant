@@ -242,3 +242,97 @@ h1 {
   opacity: 0.75;
   font-size: 0.9rem;
 }
+
+.heatmap-scroll {
+  overflow-x: auto;
+  padding-block-end: 0.25rem;
+}
+
+.heatmap {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  width: max-content;
+}
+
+.heatmap__week {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.heatmap__cell {
+  inline-size: 11px;
+  block-size: 11px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.heatmap__cell--1 {
+  background: color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+.heatmap__cell--2 {
+  background: color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+
+.heatmap__cell--3 {
+  background: var(--color-accent);
+}
+
+.heatmap__legend {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-block-start: 0.5rem;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.stat-tile {
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.stat-tile__value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: block;
+}
+
+.mistake-spot-row {
+  display: flex;
+  justify-content: space-between;
+  padding-block: 0.25rem;
+}
+
+.maps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.maps-grid img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  display: block;
+}
+
+.maps-grid figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.maps-grid figcaption {
+  text-align: center;
+  font-size: 0.85rem;
+}

@@ -30,11 +30,12 @@ jobs:
         with:
           enablement: true
 
-      - name: تجميع ملفات الموقع فقط (بلا node_modules أو tests أو docs)
+      - name: تجميع ملفات الموقع فقط (بلا node_modules أو tests أو مستندات الخطة)
         run: |
-          mkdir -p _site
+          mkdir -p _site/docs
           cp index.html manifest.webmanifest service-worker.js _site/
           cp -r src assets _site/
+          cp -r docs/maps _site/docs/
 
       - uses: actions/upload-pages-artifact@v3
         with:

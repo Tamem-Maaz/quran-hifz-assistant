@@ -10,6 +10,8 @@ import * as todayView from "./ui/views/today.js";
 import * as newSessionView from "./ui/views/new-session.js";
 import * as sessionView from "./ui/views/session.js";
 import * as reviewView from "./ui/views/review.js";
+import * as statsView from "./ui/views/stats.js";
+import * as mapsView from "./ui/views/maps.js";
 import * as settingsView from "./ui/views/settings.js";
 
 const VIEWS = {
@@ -17,12 +19,16 @@ const VIEWS = {
   "new-session": newSessionView,
   session: sessionView,
   review: reviewView,
+  stats: statsView,
+  maps: mapsView,
   settings: settingsView,
 };
 
 const NAV_LINKS = [
   { route: /** @type {const} */ ("today"), label: "اليوم" },
   { route: /** @type {const} */ ("review"), label: "المراجعة" },
+  { route: /** @type {const} */ ("stats"), label: "الإحصائيات" },
+  { route: /** @type {const} */ ("maps"), label: "الخرائط" },
   { route: /** @type {const} */ ("settings"), label: "الإعدادات" },
 ];
 
@@ -30,8 +36,12 @@ async function main() {
   const app = document.getElementById("app");
   if (!app) throw new Error("عنصر #app غير موجود في index.html");
 
-  const surahsResponse = await fetch(new URL("./data/surahs.json", import.meta.url));
+  const [surahsResponse, mapsResponse] = await Promise.all([
+    fetch(new URL("./data/surahs.json", import.meta.url)),
+    fetch(new URL("./data/maps.json", import.meta.url)),
+  ]);
   const surahs = await surahsResponse.json();
+  const maps = await mapsResponse.json();
 
   const repository = createRepository();
   const store = createStore(repository, Date.now());
@@ -42,7 +52,7 @@ async function main() {
   const viewContainer = el("div", { className: "view-container" });
   app.append(buildNav(), viewContainer);
 
-  const ctx = { store, surahs, now: () => Date.now() };
+  const ctx = { store, surahs, maps, now: () => Date.now() };
   /** @type {(() => void) | null} */
   let cleanup = null;
 
