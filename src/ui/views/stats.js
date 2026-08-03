@@ -130,14 +130,17 @@ function buildGoalCard(ctx, state) {
   }
 
   const input = /** @type {HTMLInputElement} */ (
-    el("input", { attrs: { type: "number", min: "1", inputmode: "numeric" } })
+    el("input", { attrs: { type: "number", min: "1", inputmode: "numeric", id: "goal-ayahs-per-day" } })
   );
   input.value = "5";
 
   return el("section", { className: "card" }, [
     el("h2", { text: "الهدف اليومي" }),
     el("p", { className: "muted", text: "اختياري — عدد الآيات التي تنوي حفظها يوميًا." }),
-    el("div", { className: "field" }, [el("label", { text: "آيات في اليوم" }), input]),
+    el("div", { className: "field" }, [
+      el("label", { text: "آيات في اليوم", attrs: { for: "goal-ayahs-per-day" } }),
+      input,
+    ]),
     el("div", { className: "step-counter__actions" }, [
       bigButton({
         text: "تعيين الهدف",

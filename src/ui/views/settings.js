@@ -79,7 +79,7 @@ function buildPreferencesCard(ctx, state, ui) {
   const themeSelect = /** @type {HTMLSelectElement} */ (
     el(
       "select",
-      {},
+      { attrs: { id: "settings-theme" } },
       Object.entries(THEME_LABELS).map(([value, label]) => el("option", { text: label, attrs: { value } }))
     )
   );
@@ -88,19 +88,25 @@ function buildPreferencesCard(ctx, state, ui) {
   const fontScaleSelect = /** @type {HTMLSelectElement} */ (
     el(
       "select",
-      {},
+      { attrs: { id: "settings-font-scale" } },
       Object.entries(FONT_SCALE_LABELS).map(([value, label]) => el("option", { text: label, attrs: { value } }))
     )
   );
   fontScaleSelect.value = state.settings.fontScale;
 
-  const defaultRepsInput = /** @type {HTMLInputElement} */ (el("input", { attrs: { type: "number", min: "1" } }));
+  const defaultRepsInput = /** @type {HTMLInputElement} */ (
+    el("input", { attrs: { type: "number", min: "1", id: "settings-default-reps" } })
+  );
   defaultRepsInput.value = String(state.settings.defaultReps);
 
-  const dailyLimitInput = /** @type {HTMLInputElement} */ (el("input", { attrs: { type: "number", min: "1" } }));
+  const dailyLimitInput = /** @type {HTMLInputElement} */ (
+    el("input", { attrs: { type: "number", min: "1", id: "settings-daily-limit" } })
+  );
   dailyLimitInput.value = String(state.settings.dailyReviewLimit);
 
-  const backupReminderInput = /** @type {HTMLInputElement} */ (el("input", { attrs: { type: "checkbox" } }));
+  const backupReminderInput = /** @type {HTMLInputElement} */ (
+    el("input", { className: "checkbox-input", attrs: { type: "checkbox" } })
+  );
   backupReminderInput.checked = state.settings.backupReminderEnabled;
 
   function handleSave() {
@@ -121,12 +127,27 @@ function buildPreferencesCard(ctx, state, ui) {
 
   const children = [
     el("h1", { text: "الإعدادات" }),
-    el("div", { className: "field" }, [el("label", { text: "المظهر" }), themeSelect]),
-    el("div", { className: "field" }, [el("label", { text: "حجم الخط" }), fontScaleSelect]),
-    el("div", { className: "field" }, [el("label", { text: "عدد التكرارات الافتراضي" }), defaultRepsInput]),
-    el("div", { className: "field" }, [el("label", { text: "الحد الأقصى لمراجعات اليوم" }), dailyLimitInput]),
     el("div", { className: "field" }, [
-      el("label", {}, [backupReminderInput, el("span", { text: " تذكير النسخ الاحتياطي كل 30 يومًا" })]),
+      el("label", { text: "المظهر", attrs: { for: "settings-theme" } }),
+      themeSelect,
+    ]),
+    el("div", { className: "field" }, [
+      el("label", { text: "حجم الخط", attrs: { for: "settings-font-scale" } }),
+      fontScaleSelect,
+    ]),
+    el("div", { className: "field" }, [
+      el("label", { text: "عدد التكرارات الافتراضي", attrs: { for: "settings-default-reps" } }),
+      defaultRepsInput,
+    ]),
+    el("div", { className: "field" }, [
+      el("label", { text: "الحد الأقصى لمراجعات اليوم", attrs: { for: "settings-daily-limit" } }),
+      dailyLimitInput,
+    ]),
+    el("div", { className: "field" }, [
+      el("label", { className: "checkbox-row" }, [
+        backupReminderInput,
+        el("span", { text: "تذكير النسخ الاحتياطي كل 30 يومًا" }),
+      ]),
     ]),
     el("div", { className: "step-counter__actions" }, [bigButton({ text: "حفظ", onClick: handleSave })]),
   ];
@@ -156,7 +177,7 @@ function buildBackupCard(ctx, state, ui) {
   });
 
   const fileInput = /** @type {HTMLInputElement} */ (
-    el("input", { attrs: { type: "file", accept: "application/json,.json" } })
+    el("input", { attrs: { type: "file", accept: "application/json,.json", id: "settings-import-file" } })
   );
 
   fileInput.addEventListener("change", () => {
@@ -192,7 +213,10 @@ function buildBackupCard(ctx, state, ui) {
     }),
     el("p", { className: "muted", text: lastBackupText }),
     el("div", { className: "step-counter__actions" }, [exportButton]),
-    el("div", { className: "field" }, [el("label", { text: "استيراد نسخة احتياطية (يستبدل كل البيانات الحالية)" }), fileInput]),
+    el("div", { className: "field" }, [
+      el("label", { text: "استيراد نسخة احتياطية (يستبدل كل البيانات الحالية)", attrs: { for: "settings-import-file" } }),
+      fileInput,
+    ]),
   ];
 
   if (ui.importError) {

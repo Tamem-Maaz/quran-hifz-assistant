@@ -59,7 +59,14 @@ export function activityHeatmap(days) {
     el("span", { className: "muted", text: "أكثر" }),
   ]);
 
-  const scrollContainer = el("div", { className: "heatmap-scroll" }, [grid]);
+  const scrollContainer = el(
+    "div",
+    {
+      className: "heatmap-scroll",
+      attrs: { tabindex: "0", role: "region", "aria-label": "خريطة النشاط — قابلة للتمرير أفقيًا" },
+    },
+    [grid]
+  );
 
   // إظهار الأسبوع الأحدث (اليوم) افتراضيًا بدل الأقدم — سلوك تمرير RTL يختلف
   // بين المتصفحات، فـ scrollIntoView أكثر موثوقية من ضبط scrollLeft يدويًا.

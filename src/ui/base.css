@@ -3,23 +3,33 @@
   --color-bg: #faf7f2;
   --color-fg: #1a1a1a;
   --color-accent: #1f6f5c;
+  /* --color-accent (خلفيات فقط) لا يبلغ 3:1 كحدود/نص فوق الخلفية الداكنة —
+     متغيّر منفصل للحدود ومؤشرات التركيز يُعاد تعريفه في السمة الداكنة. */
+  --color-accent-border: #1f6f5c;
+  --color-error: #b3413a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --color-bg: #14201d;
     --color-fg: #f4ede1;
+    --color-accent-border: #2fa78b;
+    --color-error: #d27a74;
   }
 }
 
 :root[data-theme="light"] {
   --color-bg: #faf7f2;
   --color-fg: #1a1a1a;
+  --color-accent-border: #1f6f5c;
+  --color-error: #b3413a;
 }
 
 :root[data-theme="dark"] {
   --color-bg: #14201d;
   --color-fg: #f4ede1;
+  --color-accent-border: #2fa78b;
+  --color-error: #d27a74;
 }
 
 :root[data-font-scale="sm"] {
@@ -84,11 +94,11 @@ body {
 
 .nav-btn:hover,
 .nav-btn:focus-visible {
-  border-color: var(--color-accent);
+  border-color: var(--color-accent-border);
 }
 
 .nav-btn:focus-visible {
-  outline: 3px solid var(--color-accent);
+  outline: 3px solid var(--color-accent-border);
   outline-offset: 2px;
 }
 
@@ -132,7 +142,7 @@ h1 {
 }
 
 .btn:focus-visible {
-  outline: 3px solid var(--color-accent);
+  outline: 3px solid var(--color-accent-border);
   outline-offset: 2px;
 }
 
@@ -143,14 +153,14 @@ h1 {
 
 .btn-secondary {
   background: transparent;
-  border-color: var(--color-accent);
+  border-color: var(--color-accent-border);
   color: var(--color-fg);
 }
 
 .btn-danger {
   background: transparent;
-  border-color: #b3413a;
-  color: #b3413a;
+  border-color: var(--color-error);
+  color: var(--color-error);
 }
 
 .btn:disabled {
@@ -221,21 +231,53 @@ h1 {
   gap: 0.3rem;
 }
 
-.field input,
+.field input:not([type="checkbox"]),
 .field select,
 .field textarea {
   min-height: 44px;
   padding-inline: 0.6rem;
   border-radius: 0.5rem;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+  /* حد كامل اللون (لا مزج شفاف) — الخلفية مطابقة لخلفية الصفحة، فالحد هو
+     الوسيلة الوحيدة لتمييز حدود الحقل، ويجب أن يبلغ 3:1 على الأقل (القسم 13.3). */
+  border: 1px solid var(--color-accent-border);
   background: var(--color-bg);
   color: var(--color-fg);
   font-family: inherit;
   font-size: 1rem;
 }
 
+.field input:not([type="checkbox"]):focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+  outline: 3px solid var(--color-accent-border);
+  outline-offset: 1px;
+}
+
+/* مربع الاختيار نفسه صغير بصريًا بحكم التصميم، لكن الصف كاملًا (checkbox-row)
+   هو منطقة اللمس الفعلية — لا يقل ارتفاعه عن 44px ويُنقر في أي مكان منه. */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.checkbox-input {
+  inline-size: 22px;
+  block-size: 22px;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkbox-input:focus-visible {
+  outline: 3px solid var(--color-accent-border);
+  outline-offset: 2px;
+}
+
 .error-text {
-  color: #b3413a;
+  color: var(--color-error);
 }
 
 .muted {
@@ -246,6 +288,11 @@ h1 {
 .heatmap-scroll {
   overflow-x: auto;
   padding-block-end: 0.25rem;
+}
+
+.heatmap-scroll:focus-visible {
+  outline: 3px solid var(--color-accent-border);
+  outline-offset: 2px;
 }
 
 .heatmap {
@@ -352,7 +399,7 @@ h1 {
 }
 
 .update-banner__button {
-  min-height: 40px;
+  min-height: 44px;
   padding-inline: 1rem;
   border-radius: 0.4rem;
   border: none;
@@ -361,4 +408,9 @@ h1 {
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
+}
+
+.update-banner__button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
 }

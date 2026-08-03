@@ -115,6 +115,7 @@ function buildMemorization(session, ctx) {
       count: step.doneReps,
       target: step.targetReps,
       incrementLabel: STAGE_META.memorization.actionLabel,
+      progressLabel: "تقدّم الحفظ بالتكرار",
       onIncrement: () => updateSession(ctx, session.id, (s) => incrementMemorizationRep(s, ctx.now())),
       onDecrement: () => updateSession(ctx, session.id, (s) => decrementMemorizationRep(s)),
     }),
@@ -147,14 +148,24 @@ function buildRecitation(session, ctx) {
     ]);
   });
 
-  const listenerInput = /** @type {HTMLInputElement} */ (el("input", { attrs: { type: "text" } }));
-  const notesInput = /** @type {HTMLTextAreaElement} */ (el("textarea", { attrs: { rows: "3" } }));
+  const listenerInput = /** @type {HTMLInputElement} */ (
+    el("input", { attrs: { type: "text", id: "recitation-listener-name" } })
+  );
+  const notesInput = /** @type {HTMLTextAreaElement} */ (
+    el("textarea", { attrs: { rows: "3", id: "recitation-notes" } })
+  );
 
   return el("section", { className: "card" }, [
     el("h2", { text: STAGE_META.recitation.title }),
     ...ayahRows,
-    el("div", { className: "field" }, [el("label", { text: "اسم المسمِّع (اختياري)" }), listenerInput]),
-    el("div", { className: "field" }, [el("label", { text: "ملاحظات (اختياري)" }), notesInput]),
+    el("div", { className: "field" }, [
+      el("label", { text: "اسم المسمِّع (اختياري)", attrs: { for: "recitation-listener-name" } }),
+      listenerInput,
+    ]),
+    el("div", { className: "field" }, [
+      el("label", { text: "ملاحظات (اختياري)", attrs: { for: "recitation-notes" } }),
+      notesInput,
+    ]),
     el("div", { className: "step-counter__actions" }, [
       bigButton({
         text: "أنهيت التسميع",

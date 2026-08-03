@@ -4,10 +4,10 @@ import { bigButton } from "./big-button.js";
 /**
  * عدّاد خطوة (القسم 6.2): عرض العدّاد، شريط تقدّم اختياري عند وجود هدف، وزر
  * تراجع اختياري. لا قفل لإمكانية الزيادة حتى بعد بلوغ الهدف.
- * @param {{count:number, target?:number, onIncrement:() => void, onDecrement?:() => void, incrementLabel:string}} options
+ * @param {{count:number, target?:number, onIncrement:() => void, onDecrement?:() => void, incrementLabel:string, progressLabel?:string}} options
  * @returns {HTMLElement}
  */
-export function stepCounter({ count, target, onIncrement, onDecrement, incrementLabel }) {
+export function stepCounter({ count, target, onIncrement, onDecrement, incrementLabel, progressLabel }) {
   // dir="ltr" إلزامي: كسر "0 / 10" داخل سياق RTL يُعيد ترتيبها بصريًا إلى "10 / 0"
   // بلا عزل صريح لاتجاه الأرقام (خوارزمية Unicode Bidi على نص محايد بين رقمين).
   const display = el("div", {
@@ -27,6 +27,7 @@ export function stepCounter({ count, target, onIncrement, onDecrement, increment
         className: "progress-bar",
         attrs: {
           role: "progressbar",
+          "aria-label": progressLabel ?? incrementLabel,
           "aria-valuemin": "0",
           "aria-valuemax": String(target),
           "aria-valuenow": String(Math.min(count, target)),
