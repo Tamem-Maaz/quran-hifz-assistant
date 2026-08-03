@@ -83,8 +83,27 @@ function buildReviewRow(item, ctx, todayKey) {
 
   children.push(
     el("div", { className: "actions" }, [
-      bigButton({ text: "نجحت", onClick: () => applyOutcome("passed"), size: "lg" }),
-      bigButton({ text: "لم أنجح", variant: "secondary", size: "lg", onClick: () => applyOutcome("failed") }),
+      bigButton({
+        text: "نجحت",
+        size: "lg",
+        confirm: {
+          title: "تثبيت نتيجة المراجعة: نجحت؟",
+          message: "يتقدّم المقطع إلى الفاصل الزمني التالي ويخرج من مستحقات اليوم.",
+          confirmLabel: "نعم، نجحت",
+        },
+        onClick: () => applyOutcome("passed"),
+      }),
+      bigButton({
+        text: "لم أنجح",
+        variant: "secondary",
+        size: "lg",
+        confirm: {
+          title: "تثبيت نتيجة المراجعة: لم أنجح؟",
+          message: "يعود المقطع إلى أول الفواصل الزمنية ويُعاد عليك قريبًا.",
+          confirmLabel: "نعم، لم أنجح",
+        },
+        onClick: () => applyOutcome("failed"),
+      }),
     ])
   );
 

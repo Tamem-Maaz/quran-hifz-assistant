@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { completeAllStages, startNewSession } from "./helpers.js";
+import { clickAndConfirm, completeAllStages, startNewSession } from "./helpers.js";
 
 test.describe("دورة تصدير → إعادة ضبط → استيراد (القسم 11 و16)", () => {
   test("تعيد الحالة بالضبط بعد التصدير وإعادة الضبط والاستيراد", async ({ page }) => {
@@ -11,7 +11,7 @@ test.describe("دورة تصدير → إعادة ضبط → استيراد (ا�
 
     const download = await Promise.all([
       page.waitForEvent("download"),
-      page.getByRole("button", { name: "تصدير نسخة احتياطية الآن" }).click(),
+      clickAndConfirm(page, "تصدير نسخة احتياطية الآن", "نعم، صدّر الآن"),
     ]).then(([d]) => d);
 
     expect(download.suggestedFilename()).toMatch(/^quran-memorization-backup-\d{4}-\d{2}-\d{2}\.json$/);

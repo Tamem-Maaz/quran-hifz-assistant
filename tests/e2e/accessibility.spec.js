@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { startNewSession } from "./helpers.js";
+import { clickAndConfirm, startNewSession } from "./helpers.js";
 
 /**
  * تدقيق وصولية آلي (القسم 13.3 و18): لا مخالفات WCAG 2.1 AA عبر كل الشاشات.
@@ -51,7 +51,7 @@ test.describe("تدقيق الوصولية (axe-core, WCAG 2.1 AA)", () => {
     for (let i = 0; i < 10; i++) await page.getByRole("button", { name: "كررت مرة" }).click();
     await page.getByRole("button", { name: "راجعت" }).click();
     await page.getByRole("button", { name: "أنهيت التسميع" }).click();
-    await page.getByRole("button", { name: "إنهاء الجلسة وجدولة المراجعة" }).click();
+    await clickAndConfirm(page, "إنهاء الجلسة وجدولة المراجعة", "نعم، أنهِ وجدوِل");
 
     await page.clock.setFixedTime(new Date(2026, 7, 4, 9, 0, 0));
     await page.reload();
@@ -59,6 +59,14 @@ test.describe("تدقيق الوصولية (axe-core, WCAG 2.1 AA)", () => {
 
     await page.getByRole("button", { name: "المراجعة", exact: true }).click();
     await expect(page.getByRole("heading", { name: "المراجعة المستحقة (1)" })).toBeVisible();
+    await expectNoAAViolations(page);
+  });
+
+  test("نافذة التأكيد مفتوحة", async ({ page }) => {
+    await page.goto("/");
+    await startNewSession(page);
+    await page.getByRole("button", { name: /إنهاء الجلسة الآن/ }).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
     await expectNoAAViolations(page);
   });
 

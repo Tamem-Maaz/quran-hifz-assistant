@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { completeAllStages, startNewSession } from "./helpers.js";
+import { clickAndConfirm, completeAllStages, startNewSession } from "./helpers.js";
 
 test.describe("رحلة الحفظ الكاملة (القسم 16)", () => {
   test("إنشاء جلسة وإتمام المراحل الست يجدولها في طابور المراجعة", async ({ page }) => {
@@ -43,7 +43,7 @@ test.describe("رحلة الحفظ الكاملة (القسم 16)", () => {
     await page.clock.setFixedTime(new Date(2026, 7, 4, 9, 0, 0));
     await page.reload();
     await page.getByRole("button", { name: "المراجعة", exact: true }).click();
-    await page.getByRole("button", { name: "نجحت" }).click();
+    await clickAndConfirm(page, "نجحت", "نعم، نجحت");
 
     await expect(page.getByText("لا مراجعات مستحقة الآن")).toBeVisible();
   });
@@ -57,7 +57,7 @@ test.describe("رحلة الحفظ الكاملة (القسم 16)", () => {
     await page.clock.setFixedTime(new Date(2026, 7, 4, 9, 0, 0));
     await page.reload();
     await page.getByRole("button", { name: "المراجعة", exact: true }).click();
-    await page.getByRole("button", { name: "لم أنجح" }).click();
+    await clickAndConfirm(page, "لم أنجح", "نعم، لم أنجح");
     await expect(page.getByText("لا مراجعات مستحقة الآن")).toBeVisible();
 
     // فاصل الإخفاق الأول ثابت دائمًا على يوم واحد — يجب أن يظهر مستحقًا غدًا

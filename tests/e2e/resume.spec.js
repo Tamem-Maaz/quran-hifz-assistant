@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { startNewSession } from "./helpers.js";
+import { clickAndConfirm, startNewSession } from "./helpers.js";
 
 test.describe("استئناف الجلسة بعد إغلاق المتصفح (القسم 6.1 و16)", () => {
   test("يستأنف من نفس المرحلة بعد إغلاق المتصفح وإعادة فتح التطبيق من الرابط الرئيسي", async ({ page }) => {
@@ -52,7 +52,7 @@ test.describe("استئناف الجلسة بعد إغلاق المتصفح (ا�
   test("جلسة مهجورة لا تُستأنف ولا تمنع بدء سبق جديد", async ({ page }) => {
     await page.goto("/");
     await startNewSession(page, { surah: "1", from: "1", to: "1" });
-    await page.getByRole("button", { name: /إنهاء الجلسة الآن/ }).click();
+    await clickAndConfirm(page, /إنهاء الجلسة الآن/, "نعم، أنهِ الجلسة");
 
     await expect(page.getByRole("heading", { name: "لم تبدأ سبقًا جديدًا اليوم" })).toBeVisible();
   });

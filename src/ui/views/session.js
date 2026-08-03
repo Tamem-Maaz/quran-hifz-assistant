@@ -88,6 +88,11 @@ function build(session, ctx) {
       bigButton({
         text: "إنهاء الجلسة الآن (تُحفظ كمتوقفة)",
         variant: "danger",
+        confirm: {
+          title: "إنهاء الجلسة الآن؟",
+          message: "يُحفَظ تقدّمها في سجلّك، لكنها لا تُستأنف — العودة إلى الحفظ تبدأ سبقًا جديدًا.",
+          confirmLabel: "نعم، أنهِ الجلسة",
+        },
         onClick: () => {
           updateSession(ctx, session.id, (s) => abandonSession(s));
           navigate("today");
@@ -228,6 +233,11 @@ function buildFinish(session, ctx) {
       bigButton({
         text: "إنهاء الجلسة وجدولة المراجعة",
         size: "lg",
+        confirm: {
+          title: "إنهاء الجلسة وجدولة المراجعة؟",
+          message: "يُغلَق السبق ويدخل المقطع جدول المراجعة، فيعود إليك في موعده.",
+          confirmLabel: "نعم، أنهِ وجدوِل",
+        },
         onClick: () => {
           const now = ctx.now();
           const todayKey = toDayKey(new Date(now));

@@ -366,6 +366,33 @@
     font-size: var(--text-sm);
   }
 
+  /* ===== نافذة التأكيد ===== */
+
+  .confirm {
+    max-inline-size: min(28rem, 92vw);
+    padding: var(--space-5);
+    border: var(--border-hair) solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--fg);
+    box-shadow: var(--shadow-2);
+  }
+
+  .confirm::backdrop {
+    background: rgba(14, 17, 23, 0.55);
+  }
+
+  .confirm__title {
+    margin-block-end: var(--space-2);
+    font-size: var(--text-lg);
+  }
+
+  .confirm__message {
+    margin-block-end: var(--space-5);
+    color: var(--fg-muted);
+    font-size: var(--text-sm);
+  }
+
   /* ===== صندوق تكبير الصور ===== */
 
   .lightbox {

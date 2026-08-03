@@ -220,6 +220,11 @@ function buildBackupCard(ctx, state, ui) {
 
   const exportButton = bigButton({
     text: "تصدير نسخة احتياطية الآن",
+    confirm: {
+      title: "تصدير نسخة احتياطية الآن؟",
+      message: "يُنزَّل ملف JSON بكل بياناتك إلى جهازك، ويُسجَّل تاريخ اليوم آخرَ نسخة.",
+      confirmLabel: "نعم، صدّر الآن",
+    },
     onClick: () => {
       const current = store.getState();
       const nowMs = now();

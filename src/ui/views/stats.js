@@ -129,6 +129,11 @@ function buildGoalCard(ctx, state) {
         bigButton({
           text: "إلغاء الهدف",
           variant: "secondary",
+          confirm: {
+            title: "إلغاء الهدف اليومي؟",
+            message: "يُحذف الهدف الحالي، ويمكنك تعيين هدف جديد في أي وقت.",
+            confirmLabel: "نعم، ألغِ الهدف",
+          },
           onClick: () => store.setState({ ...store.getState(), goal: null }),
         }),
       ]),

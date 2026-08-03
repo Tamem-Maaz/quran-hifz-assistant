@@ -81,6 +81,11 @@ function buildBackupReminderCard(ctx, state, todayKey) {
     el("div", { className: "actions" }, [
       bigButton({
         text: "تصدير الآن",
+        confirm: {
+          title: "تصدير نسخة احتياطية الآن؟",
+          message: "يُنزَّل ملف JSON بكل بياناتك إلى جهازك، ويُسجَّل تاريخ اليوم آخرَ نسخة.",
+          confirmLabel: "نعم، صدّر الآن",
+        },
         onClick: () => {
           const current = store.getState();
           const nowMs = now();
@@ -167,6 +172,11 @@ function buildReviewCard({ dueItems, overflowCount, surahs, store, todayKey }) {
         bigButton({
           text: "إعادة توزيع المتراكم",
           variant: "secondary",
+          confirm: {
+            title: "إعادة توزيع المراجعات المتراكمة؟",
+            message: "تُوزَّع المستحقات المتأخرة على الأيام السبعة القادمة، فتتغيّر مواعيدها المجدولة.",
+            confirmLabel: "نعم، أعد التوزيع",
+          },
           onClick: () => {
             const state = store.getState();
             const redistributed = redistributeBacklog(state.reviewQueue, todayKey, 7);
