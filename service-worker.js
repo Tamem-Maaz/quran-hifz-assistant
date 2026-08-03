@@ -7,7 +7,7 @@
  * عند أي نشر يغيّر محتوى ملف مخزَّن مسبقًا (هذا ما يُفعّل مسار الترقية).
  */
 
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const CACHE_NAME = `quran-hifz-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
@@ -15,6 +15,10 @@ const PRECACHE_URLS = [
   "./index.html",
   "./manifest.webmanifest",
   "./assets/icons/icon.svg",
+  "./assets/icons/icon-maskable.svg",
+  "./assets/fonts/almarai-400-arabic.woff2",
+  "./assets/fonts/almarai-400-latin.woff2",
+  "./assets/fonts/aref-ruqaa-700-arabic.woff2",
   "./src/main.js",
   "./src/version.js",
   "./src/core/dates.js",
@@ -38,6 +42,7 @@ const PRECACHE_URLS = [
   "./src/ui/components/step-counter.js",
   "./src/ui/components/heatmap.js",
   "./src/ui/components/lightbox.js",
+  "./src/ui/components/icons.js",
   "./src/ui/views/today.js",
   "./src/ui/views/new-session.js",
   "./src/ui/views/session.js",

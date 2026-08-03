@@ -11,6 +11,7 @@ import { computeProgressPercentage, estimateCompletionDayKey, TOTAL_AYAHS } from
 import { formatDayKeyLong, formatPortion } from "../format.js";
 import { el, clear } from "../components/dom.js";
 import { bigButton } from "../components/big-button.js";
+import { brandMark } from "../components/icons.js";
 import { downloadBackup } from "../download-backup.js";
 import { navigate } from "../router.js";
 
@@ -42,9 +43,10 @@ function build(ctx) {
   const { current: streak } = computeStreak(state.sessions, state.reviewQueue, todayKey);
   const { items: dueItems, overflowCount } = getDueItems(state.reviewQueue, todayKey, state.settings.dailyReviewLimit);
 
-  const header = el("header", { className: "card" }, [
+  const header = el("header", { className: "card card--hero" }, [
+    brandMark("card--hero__watermark"),
     el("h1", { text: `اليوم — ${formatDayKeyLong(todayKey)}` }),
-    el("p", { className: "muted", text: streak > 0 ? `🔥 تتابع: ${streak} يومًا` : "ابدأ تتابعك اليوم" }),
+    el("p", { className: "muted", text: streak > 0 ? `تتابع: ${streak} يومًا` : "ابدأ تتابعك اليوم" }),
   ]);
 
   const sections = [header];
@@ -119,7 +121,7 @@ function buildSabaqCard({ openSession, hasAnySessions, completedToday, surahs, t
 
   if (completedToday) {
     return el("section", { className: "card" }, [
-      el("h2", { text: "أنجزت سبق اليوم ✅" }),
+      el("h2", { text: "أنجزت سبق اليوم" }),
       el("div", { className: "step-counter__actions" }, [
         bigButton({ text: "جلسة إضافية", onClick: () => navigate("new-session"), variant: "secondary" }),
       ]),

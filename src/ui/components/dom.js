@@ -30,3 +30,20 @@ export function el(tag, options = {}, children = []) {
 export function clear(container) {
   while (container.firstChild) container.removeChild(container.firstChild);
 }
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+/**
+ * منشئ عناصر SVG — عناصر SVG تحتاج createElementNS، لا createElement
+ * العادي (وإلا لا تُعرَض). كل الأيقونات في التطبيق تُبنى بهذا بدل innerHTML.
+ * @param {string} tag
+ * @param {Record<string,string>} [attrs]
+ * @param {SVGElement[]} [children]
+ * @returns {SVGElement}
+ */
+export function svgEl(tag, attrs = {}, children = []) {
+  const node = document.createElementNS(SVG_NS, tag);
+  for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+  for (const child of children) node.append(child);
+  return node;
+}

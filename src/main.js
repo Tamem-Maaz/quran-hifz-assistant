@@ -6,6 +6,7 @@ import { createRepository } from "./storage/repository.js";
 import { createStore } from "./ui/store.js";
 import { startRouter, navigate } from "./ui/router.js";
 import { el, clear } from "./ui/components/dom.js";
+import { brandMark, navIcon } from "./ui/components/icons.js";
 import * as todayView from "./ui/views/today.js";
 import * as newSessionView from "./ui/views/new-session.js";
 import * as sessionView from "./ui/views/session.js";
@@ -25,11 +26,11 @@ const VIEWS = {
 };
 
 const NAV_LINKS = [
-  { route: /** @type {const} */ ("today"), label: "اليوم" },
-  { route: /** @type {const} */ ("review"), label: "المراجعة" },
-  { route: /** @type {const} */ ("stats"), label: "الإحصائيات" },
-  { route: /** @type {const} */ ("maps"), label: "الخرائط" },
-  { route: /** @type {const} */ ("settings"), label: "الإعدادات" },
+  { route: /** @type {const} */ ("today"), label: "اليوم", icon: /** @type {const} */ ("today") },
+  { route: /** @type {const} */ ("review"), label: "المراجعة", icon: /** @type {const} */ ("review") },
+  { route: /** @type {const} */ ("stats"), label: "الإحصائيات", icon: /** @type {const} */ ("stats") },
+  { route: /** @type {const} */ ("maps"), label: "الخرائط", icon: /** @type {const} */ ("maps") },
+  { route: /** @type {const} */ ("settings"), label: "الإعدادات", icon: /** @type {const} */ ("settings") },
 ];
 
 async function main() {
@@ -49,14 +50,16 @@ async function main() {
   applyTheme(store.getState().settings);
   store.subscribe((state) => applyTheme(state.settings));
 
+  const navContainer = el("nav", { className: "app-nav" });
   const viewContainer = el("div", { className: "view-container" });
-  app.append(buildNav(), viewContainer);
+  app.append(buildHeader(), navContainer, viewContainer);
 
   const ctx = { store, surahs, maps, now: () => Date.now() };
   /** @type {(() => void) | null} */
   let cleanup = null;
 
   startRouter((route) => {
+    renderNav(navContainer, route);
     if (cleanup) cleanup();
     const result = VIEWS[route].render(viewContainer, ctx);
     cleanup = typeof result === "function" ? result : null;
@@ -76,8 +79,7 @@ function registerServiceWorker() {
 
   // لا نستمع لـ controllerchange هنا عالميًا: هذا الحدث يُطلَق أيضًا في أول
   // مرة تتحكّم فيها Service Worker بصفحة غير متحكَّم بها (self.clients.claim()
-  // عند أول تثبيت) — وهذه ليست ترقية، فإعادة تحميل غير مشروطة هنا كانت تُعيد
-  // تحميل الصفحة فور أول زيارة بلا داعٍ. الاستماع الفعلي يبدأ فقط داخل
+  // عند أول تثبيت) — وهذه ليست ترقية. الاستماع الفعلي يبدأ فقط داخل
   // showUpdateBanner، أي بعد تأكّد وجود تحديث حقيقي.
 
   // "load" قد يكون أُطلق بالفعل قبل تنفيذ هذا السكربت (شائع على تحميل محلي
@@ -145,19 +147,35 @@ function applyTheme(settings) {
   root.dataset.fontScale = settings.fontScale;
 }
 
-function buildNav() {
-  return el(
-    "nav",
-    { className: "app-nav" },
-    NAV_LINKS.map((link) =>
-      el("button", {
-        className: "nav-btn",
-        text: link.label,
-        attrs: { type: "button" },
-        onClick: () => navigate(link.route),
-      })
-    )
-  );
+function buildHeader() {
+  return el("header", { className: "app-header" }, [
+    brandMark(),
+    el("p", { className: "app-header__title", text: "حفظ القرآن", attrs: { title: "المساعد بحفظ القرآن الكريم" } }),
+  ]);
+}
+
+/**
+ * يعيد بناء التنقّل مع تعليم المسار الحالي (aria-current) — إعادة البناء
+ * كاملة أبسط من تحديث الأزرار الحالية، والعدد صغير فلا كلفة ملحوظة.
+ * @param {HTMLElement} container
+ * @param {import('./ui/router.js').Route} activeRoute
+ */
+function renderNav(container, activeRoute) {
+  clear(container);
+  for (const link of NAV_LINKS) {
+    const isActive = link.route === activeRoute;
+    container.append(
+      el(
+        "button",
+        {
+          className: "nav-btn",
+          attrs: { type: "button", ...(isActive ? { "aria-current": "page" } : {}) },
+          onClick: () => navigate(link.route),
+        },
+        [navIcon(link.icon), el("span", { text: link.label })]
+      )
+    );
+  }
 }
 
 main().catch((error) => {
