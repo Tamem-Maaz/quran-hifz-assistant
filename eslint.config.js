@@ -50,6 +50,17 @@ export default [
     },
   },
   {
+    files: ["service-worker.js"],
+    languageOptions: {
+      globals: {
+        self: "readonly",
+        caches: "readonly",
+        fetch: "readonly",
+        console: "readonly",
+      },
+    },
+  },
+  {
     ignores: ["node_modules/**", "coverage/**", "dist/**", "src/data/surahs.json", "src/data/maps.json"],
   },
 ];

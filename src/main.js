@@ -61,6 +61,75 @@ async function main() {
     const result = VIEWS[route].render(viewContainer, ctx);
     cleanup = typeof result === "function" ? result : null;
   });
+
+  registerServiceWorker();
+}
+
+/**
+ * تسجيل Service Worker وإدارة إشعار التحديث (القسم 15). عند اكتشاف نسخة
+ * جديدة مثبَّتة بينما نسخة سابقة لا تزال تتحكّم بالصفحة، تُعرض لافتة
+ * «يتوفر تحديث — إعادة التحميل»؛ الضغط عليها يرسل SKIP_WAITING فتُفعَّل
+ * النسخة الجديدة تلقائيًا (controllerchange) وتُعاد الصفحة.
+ */
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+
+  // لا نستمع لـ controllerchange هنا عالميًا: هذا الحدث يُطلَق أيضًا في أول
+  // مرة تتحكّم فيها Service Worker بصفحة غير متحكَّم بها (self.clients.claim()
+  // عند أول تثبيت) — وهذه ليست ترقية، فإعادة تحميل غير مشروطة هنا كانت تُعيد
+  // تحميل الصفحة فور أول زيارة بلا داعٍ. الاستماع الفعلي يبدأ فقط داخل
+  // showUpdateBanner، أي بعد تأكّد وجود تحديث حقيقي.
+
+  // "load" قد يكون أُطلق بالفعل قبل تنفيذ هذا السكربت (شائع على تحميل محلي
+  // سريع)، فالاعتماد على addEventListener("load", ...) وحده يُفوّت التسجيل
+  // بصمت. document.readyState === "complete" يغطي هذه الحالة مباشرة.
+  if (document.readyState === "complete") {
+    void doRegister();
+  } else {
+    window.addEventListener("load", () => void doRegister());
+  }
+
+  async function doRegister() {
+    try {
+      const registration = await navigator.serviceWorker.register(
+        new URL("../service-worker.js", import.meta.url)
+      );
+      registration.addEventListener("updatefound", () => {
+        const installing = registration.installing;
+        if (!installing) return;
+        installing.addEventListener("statechange", () => {
+          if (installing.state === "installed" && navigator.serviceWorker.controller) {
+            showUpdateBanner(registration);
+          }
+        });
+      });
+    } catch (error) {
+      console.error("تعذّر تسجيل Service Worker", error);
+    }
+  }
+}
+
+/**
+ * @param {ServiceWorkerRegistration} registration
+ */
+function showUpdateBanner(registration) {
+  let hasReloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hasReloaded) return;
+    hasReloaded = true;
+    window.location.reload();
+  });
+
+  const banner = el("div", { className: "update-banner", attrs: { role: "status" } }, [
+    el("span", { text: "يتوفر تحديث للتطبيق" }),
+    el("button", {
+      className: "update-banner__button",
+      text: "إعادة التحميل",
+      attrs: { type: "button" },
+      onClick: () => registration.waiting?.postMessage("SKIP_WAITING"),
+    }),
+  ]);
+  document.body.append(banner);
 }
 
 /**
