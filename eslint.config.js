@@ -17,6 +17,7 @@ export default [
         DOMException: "readonly",
         TextEncoder: "readonly",
         URL: "readonly",
+        Blob: "readonly",
       },
     },
     rules: {

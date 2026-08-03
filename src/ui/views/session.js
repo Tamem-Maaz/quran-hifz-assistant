@@ -167,6 +167,16 @@ function buildRecitation(session, ctx) {
   ]);
 }
 
+/**
+ * طلب تخزين دائم عند أول جلسة مكتملة (القسم 11.1) — يقلّل احتمال حذف المتصفح
+ * التلقائي لبيانات مواقع غير مستخدمة لفترة طويلة. الرفض يُتجاهل بصمت.
+ */
+function requestPersistentStorage() {
+  if (navigator.storage?.persist) {
+    navigator.storage.persist().catch(() => {});
+  }
+}
+
 function buildFinish(session, ctx) {
   return el("section", { className: "card" }, [
     el("h2", { text: "أحسنت! اكتملت كل مراحل السبق" }),
@@ -177,6 +187,7 @@ function buildFinish(session, ctx) {
           const now = ctx.now();
           const todayKey = toDayKey(new Date(now));
           const state = ctx.store.getState();
+          const isFirstEverCompletion = !state.sessions.some((s) => s.status === "completed");
           const reviewItem = createReviewItem(
             { id: crypto.randomUUID(), portion: session.portion, sourceSessionId: session.id },
             todayKey
@@ -187,6 +198,7 @@ function buildFinish(session, ctx) {
             sessions: nextSessions,
             reviewQueue: [...state.reviewQueue, reviewItem],
           });
+          if (isFirstEverCompletion) requestPersistentStorage();
           navigate("today");
         },
       }),

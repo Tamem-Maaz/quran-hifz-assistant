@@ -3,7 +3,7 @@
  * اليوم، وماذا أراجع مما حفظته سابقًا.
  */
 
-import { toDayKey } from "../../core/dates.js";
+import { diffInDays, toDayKey } from "../../core/dates.js";
 import { findOpenSession } from "../../core/session.js";
 import { getDueItems, redistributeBacklog } from "../../core/scheduler.js";
 import { computeStreak, totalAyahsMemorized } from "../../core/statistics.js";
@@ -11,9 +11,11 @@ import { computeProgressPercentage, estimateCompletionDayKey, TOTAL_AYAHS } from
 import { formatDayKeyLong, formatPortion } from "../format.js";
 import { el, clear } from "../components/dom.js";
 import { bigButton } from "../components/big-button.js";
+import { downloadBackup } from "../download-backup.js";
 import { navigate } from "../router.js";
 
 const OVERFLOW_ALERT_THRESHOLD = 10;
+const BACKUP_REMINDER_DAYS = 30;
 
 /** @typedef {import('../store.js').AppContext} AppContext */
 
@@ -45,7 +47,12 @@ function build(ctx) {
     el("p", { className: "muted", text: streak > 0 ? `🔥 تتابع: ${streak} يومًا` : "ابدأ تتابعك اليوم" }),
   ]);
 
-  const sections = [header, buildSabaqCard({ openSession, hasAnySessions, completedToday, surahs, todayKey })];
+  const sections = [header];
+
+  const backupReminder = buildBackupReminderCard(ctx, state, todayKey);
+  if (backupReminder) sections.push(backupReminder);
+
+  sections.push(buildSabaqCard({ openSession, hasAnySessions, completedToday, surahs, todayKey }));
 
   if (dueItems.length > 0 || overflowCount > 0) {
     sections.push(buildReviewCard({ dueItems, overflowCount, surahs, store, todayKey }));
@@ -56,6 +63,34 @@ function build(ctx) {
   }
 
   return el("div", { className: "view view-today" }, sections);
+}
+
+function buildBackupReminderCard(ctx, state, todayKey) {
+  const { store, now } = ctx;
+  if (!state.settings.backupReminderEnabled) return null;
+
+  const lastBackupDayKey = toDayKey(new Date(state.lastBackupAt));
+  const daysSinceBackup = diffInDays(lastBackupDayKey, todayKey);
+  if (daysSinceBackup < BACKUP_REMINDER_DAYS) return null;
+
+  return el("section", { className: "card" }, [
+    el("h2", { text: "تذكير بالنسخ الاحتياطي" }),
+    el("p", {
+      text: `مضى ${daysSinceBackup} يومًا منذ آخر نسخة احتياطية. بياناتك محفوظة في متصفحك فقط، والنسخ الاحتياطي حمايتك الوحيدة من فقدانها.`,
+    }),
+    el("div", { className: "step-counter__actions" }, [
+      bigButton({
+        text: "تصدير الآن",
+        onClick: () => {
+          const current = store.getState();
+          const nowMs = now();
+          downloadBackup(current, nowMs);
+          store.setState({ ...current, lastBackupAt: nowMs });
+        },
+      }),
+      bigButton({ text: "فتح الإعدادات", variant: "secondary", onClick: () => navigate("settings") }),
+    ]),
+  ]);
 }
 
 function buildSabaqCard({ openSession, hasAnySessions, completedToday, surahs, todayKey }) {
