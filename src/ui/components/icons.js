@@ -28,6 +28,17 @@ const STROKE_ATTRS = {
 };
 
 const ICON_BUILDERS = {
+  "new-session": () =>
+    svgEl("svg", STROKE_ATTRS, [
+      svgEl("circle", { cx: "12", cy: "12", r: "9" }),
+      svgEl("line", { x1: "12", y1: "8", x2: "12", y2: "16" }),
+      svgEl("line", { x1: "8", y1: "12", x2: "16", y2: "12" }),
+    ]),
+  session: () =>
+    svgEl("svg", STROKE_ATTRS, [
+      svgEl("path", { d: "M4 5.5c2-1 5-1 7 1v13c-2-2-5-2-7-1v-13Z" }),
+      svgEl("path", { d: "M20 5.5c-2-1-5-1-7 1v13c2-2 5-2 7-1v-13Z" }),
+    ]),
   today: () =>
     svgEl("svg", STROKE_ATTRS, [
       svgEl("circle", { cx: "12", cy: "12", r: "4" }),

@@ -18,6 +18,16 @@ export function formatDayKeyLong(dayKey) {
 }
 
 /**
+ * @param {string} dayKey
+ * @returns {string} مثل "٣ أغسطس" — بلا سنة أو يوم أسبوع، لسياقات مضغوطة كشريط المعلومات العلوي.
+ */
+export function formatDayKeyShort(dayKey) {
+  const [year, month, day] = dayKey.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  return new Intl.DateTimeFormat("ar", { day: "numeric", month: "long" }).format(date);
+}
+
+/**
  * @param {Portion} portion
  * @param {{id:number, name:string}[]} surahs
  * @returns {string} مثل "البقرة 12 — 15"

@@ -156,6 +156,22 @@ h3 {
   gap: 1.1rem;
 }
 
+/* لوحة تحكّم: عمود جانبي (شعار + تنقّل) وعمود رئيسي (شريط معلومات + محتوى).
+   على الهاتف والتابلت يظلّان مكدَّسين بعموديّة #app أعلاه؛ عند اللابتوب
+   يتحوّلان إلى عمودين جنبًا إلى جنب (القسم أدناه). */
+.app-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  min-width: 0;
+}
+
 .app-header {
   display: flex;
   align-items: center;
@@ -186,6 +202,48 @@ h3 {
   border-block-end: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
   mask-image: linear-gradient(to right, transparent, black 1rem, black calc(100% - 1rem), transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black 1rem, black calc(100% - 1rem), transparent);
+}
+
+/* شريط المعلومات العلوي: عنوان الصفحة الحالية (تنقّل تكميلي) + شارات
+   سياقية عامة (تاريخ اليوم والتتابع) — مفيدة بصرف النظر عن الصفحة. */
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-block: 0.6rem;
+  border-block-end: 1px solid color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+
+.app-topbar__page {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--color-fg);
+}
+
+.app-topbar__page svg {
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  color: var(--color-accent-border);
+  flex-shrink: 0;
+}
+
+.app-topbar__meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.app-topbar__badge {
+  font-size: 0.82rem;
+  color: var(--color-fg);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  white-space: nowrap;
 }
 
 .nav-btn {
@@ -226,6 +284,12 @@ h3 {
 }
 
 /* ===== البطاقات ===== */
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
 
 .card {
   background: var(--color-surface);
@@ -683,21 +747,20 @@ h3 {
     padding-inline: 1rem;
   }
 
-  .app-header {
-    grid-column: 1;
-    grid-row: 1;
+  .app-sidebar {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+    gap: 1.75rem;
+    border-inline-end: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+    padding-inline-end: 1.25rem;
   }
 
   .app-nav {
-    grid-column: 1;
-    grid-row: 2;
-    position: sticky;
-    top: 2rem;
     flex-direction: column;
     align-items: stretch;
     border-block-end: none;
-    border-inline-end: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
-    padding-inline-end: 1rem;
+    padding-block: 0;
     overflow-x: visible;
     mask-image: none;
     -webkit-mask-image: none;
@@ -707,10 +770,12 @@ h3 {
     justify-content: flex-start;
   }
 
-  .view-container {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    min-width: 0;
+  .app-topbar {
+    position: sticky;
+    top: 2rem;
+    z-index: 5;
+    background: color-mix(in srgb, var(--color-bg) 94%, transparent);
+    backdrop-filter: blur(6px);
   }
 
   .stat-grid {

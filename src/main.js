@@ -7,6 +7,9 @@ import { createStore } from "./ui/store.js";
 import { startRouter, navigate } from "./ui/router.js";
 import { el, clear } from "./ui/components/dom.js";
 import { brandMark, navIcon } from "./ui/components/icons.js";
+import { toDayKey } from "./core/dates.js";
+import { computeStreak } from "./core/statistics.js";
+import { formatDayKeyShort } from "./ui/format.js";
 import * as todayView from "./ui/views/today.js";
 import * as newSessionView from "./ui/views/new-session.js";
 import * as sessionView from "./ui/views/session.js";
@@ -25,13 +28,21 @@ const VIEWS = {
   settings: settingsView,
 };
 
-const NAV_LINKS = [
-  { route: /** @type {const} */ ("today"), label: "اليوم", icon: /** @type {const} */ ("today") },
-  { route: /** @type {const} */ ("review"), label: "المراجعة", icon: /** @type {const} */ ("review") },
-  { route: /** @type {const} */ ("stats"), label: "الإحصائيات", icon: /** @type {const} */ ("stats") },
-  { route: /** @type {const} */ ("maps"), label: "الخرائط", icon: /** @type {const} */ ("maps") },
-  { route: /** @type {const} */ ("settings"), label: "الإعدادات", icon: /** @type {const} */ ("settings") },
-];
+/** بيانات وصفية لكل مسار — تُستخدم للتنقّل الجانبي (خمسة مسارات رئيسية فقط)
+ * ولشريط المعلومات العلوي (كل المسارات السبعة، بما فيها بدء السبق والجلسة
+ * غير الظاهرين في القائمة الجانبية). */
+const ROUTE_META = {
+  today: { label: "اليوم", icon: /** @type {const} */ ("today") },
+  "new-session": { label: "بدء سبق جديد", icon: /** @type {const} */ ("new-session") },
+  session: { label: "جلسة الحفظ", icon: /** @type {const} */ ("session") },
+  review: { label: "المراجعة", icon: /** @type {const} */ ("review") },
+  stats: { label: "الإحصائيات", icon: /** @type {const} */ ("stats") },
+  maps: { label: "الخرائط الذهنية", icon: /** @type {const} */ ("maps") },
+  settings: { label: "الإعدادات", icon: /** @type {const} */ ("settings") },
+};
+
+const NAV_ROUTES = /** @type {const} */ (["today", "review", "stats", "maps", "settings"]);
+const NAV_LINKS = NAV_ROUTES.map((route) => ({ route, ...ROUTE_META[route] }));
 
 async function main() {
   const app = document.getElementById("app");
@@ -50,16 +61,25 @@ async function main() {
   applyTheme(store.getState().settings);
   store.subscribe((state) => applyTheme(state.settings));
 
-  const navContainer = el("nav", { className: "app-nav" });
+  const navContainer = el("nav", { className: "app-nav", attrs: { "aria-label": "التنقّل الرئيسي" } });
+  const sidebar = el("div", { className: "app-sidebar" }, [buildHeader(), navContainer]);
+  const topbarContainer = el("div", { className: "app-topbar" });
   const viewContainer = el("div", { className: "view-container" });
-  app.append(buildHeader(), navContainer, viewContainer);
+  const mainColumn = el("div", { className: "app-main" }, [topbarContainer, viewContainer]);
+  app.append(sidebar, mainColumn);
 
   const ctx = { store, surahs, maps, now: () => Date.now() };
   /** @type {(() => void) | null} */
   let cleanup = null;
+  /** @type {import('./ui/router.js').Route} */
+  let currentRoute = "today";
+
+  store.subscribe(() => renderTopbar(topbarContainer, currentRoute, ctx));
 
   startRouter((route) => {
+    currentRoute = route;
     renderNav(navContainer, route);
+    renderTopbar(topbarContainer, route, ctx);
     if (cleanup) cleanup();
     const result = VIEWS[route].render(viewContainer, ctx);
     cleanup = typeof result === "function" ? result : null;
@@ -176,6 +196,30 @@ function renderNav(container, activeRoute) {
       )
     );
   }
+}
+
+/**
+ * شريط المعلومات العلوي: عنوان الصفحة الحالية (كتنقّل تكميلي، لا بديل عن
+ * عنوان الصفحة ذاته) + معلومات سياقية عامة (تاريخ اليوم والتتابع الحالي)
+ * مفيدة بصرف النظر عن الصفحة المعروضة. يُعاد بناؤه عند كل تغيّر مسار أو حالة.
+ * @param {HTMLElement} container
+ * @param {import('./ui/router.js').Route} route
+ * @param {import('./ui/store.js').AppContext} ctx
+ */
+function renderTopbar(container, route, ctx) {
+  clear(container);
+  const meta = ROUTE_META[route];
+  const state = ctx.store.getState();
+  const todayKey = toDayKey(new Date(ctx.now()));
+  const { current: streak } = computeStreak(state.sessions, state.reviewQueue, todayKey);
+
+  container.append(
+    el("div", { className: "app-topbar__page" }, [navIcon(meta.icon), el("span", { text: meta.label })]),
+    el("div", { className: "app-topbar__meta" }, [
+      el("span", { className: "app-topbar__badge", text: formatDayKeyShort(todayKey) }),
+      el("span", { className: "app-topbar__badge", text: streak > 0 ? `تتابع ${streak}` : "ابدأ تتابعك" }),
+    ])
+  );
 }
 
 main().catch((error) => {

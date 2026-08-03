@@ -7,7 +7,7 @@
  * عند أي نشر يغيّر محتوى ملف مخزَّن مسبقًا (هذا ما يُفعّل مسار الترقية).
  */
 
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const CACHE_NAME = `quran-hifz-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
