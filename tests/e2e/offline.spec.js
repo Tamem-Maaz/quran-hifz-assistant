@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { completeAllStages, startNewSession } from "./helpers.js";
+import { completeAllStages, pressStage, startNewSession } from "./helpers.js";
 
 /**
  * معيار اكتمال المرحلة 6 حرفيًا (القسم 18): «التطبيق يعمل كاملًا في وضع الطيران».
@@ -37,7 +37,7 @@ test.describe("العمل دون إنترنت (القسم 15 و18)", () => {
     await waitForServiceWorkerControl(page);
 
     await startNewSession(page);
-    await page.getByRole("button", { name: "استمعت" }).click();
+    await pressStage(page, "استمعت");
 
     await context.setOffline(true);
     await page.reload();

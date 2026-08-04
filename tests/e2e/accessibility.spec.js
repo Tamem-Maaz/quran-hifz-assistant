@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { clickAndConfirm, startNewSession } from "./helpers.js";
+import { clickAndConfirm, pressStage, startNewSession } from "./helpers.js";
 
 /**
  * تدقيق وصولية آلي (القسم 13.3 و18): لا مخالفات WCAG 2.1 AA عبر كل الشاشات.
@@ -31,13 +31,13 @@ test.describe("تدقيق الوصولية (axe-core, WCAG 2.1 AA)", () => {
     await startNewSession(page);
     await expectNoAAViolations(page);
 
-    await page.getByRole("button", { name: "استمعت" }).click();
-    await page.getByRole("button", { name: "قرأت التفسير" }).click();
-    await page.getByRole("button", { name: "استمعت" }).click();
+    await pressStage(page, "استمعت");
+    await pressStage(page, "قرأت التفسير");
+    await pressStage(page, "استمعت");
     await expectNoAAViolations(page); // مرحلة الحفظ (بها progressbar وعدّاد aria-live)
 
-    for (let i = 0; i < 10; i++) await page.getByRole("button", { name: "كررت مرة" }).click();
-    await page.getByRole("button", { name: "راجعت" }).click();
+    for (let i = 0; i < 10; i++) await pressStage(page, "كررت مرة");
+    await pressStage(page, "راجعت");
     await expectNoAAViolations(page); // مرحلة التسميع (بها قائمة آيات وأزرار تكرارية)
   });
 
@@ -46,11 +46,11 @@ test.describe("تدقيق الوصولية (axe-core, WCAG 2.1 AA)", () => {
     await page.goto("/");
     await startNewSession(page);
     for (const label of ["استمعت", "قرأت التفسير", "استمعت"]) {
-      await page.getByRole("button", { name: label }).click();
+      await pressStage(page, label);
     }
-    for (let i = 0; i < 10; i++) await page.getByRole("button", { name: "كررت مرة" }).click();
-    await page.getByRole("button", { name: "راجعت" }).click();
-    await page.getByRole("button", { name: "أنهيت التسميع" }).click();
+    for (let i = 0; i < 10; i++) await pressStage(page, "كررت مرة");
+    await pressStage(page, "راجعت");
+    await pressStage(page, "أنهيت التسميع");
     await clickAndConfirm(page, "إنهاء الجلسة وجدولة المراجعة", "نعم، أنهِ وجدوِل");
 
     await page.clock.setFixedTime(new Date(2026, 7, 4, 9, 0, 0));

@@ -7,7 +7,9 @@
 import { toDayKey } from "../../core/dates.js";
 import { createSession, isValidPortion, portionEndAyah } from "../../core/session.js";
 import { formatAyahCount } from "../format.js";
+import { formatPortion } from "../format.js";
 import { el, clear } from "../components/dom.js";
+import { confirmAction } from "../components/confirm.js";
 import { bigButton } from "../components/big-button.js";
 import { cardHead } from "../components/card.js";
 import { openImageLightbox } from "../components/lightbox.js";
@@ -129,6 +131,8 @@ export function render(container, ctx) {
 
   const errorBox = el("p", { className: "error-text", attrs: { role: "alert" } });
 
+  // التحقّق يسبق السؤال لا العكس: تأكيدُ مقطعٍ غير صالح ثم إظهار خطأ بعده
+  // يجعل النافذة عائقًا لا حارسًا. الزرّ هنا بلا `confirm` تصريحي لهذا السبب.
   function handleStart() {
     errorBox.textContent = "";
 
@@ -141,6 +145,21 @@ export function render(container, ctx) {
       return;
     }
 
+    confirmAction({
+      title: "بدء سبق جديد؟",
+      message: `المقطع: ${formatPortion({ surah, fromAyah, toAyah }, surahs)} — تبدأ الجلسة بمراحلها الست.`,
+      confirmLabel: "نعم، ابدأ الجلسة",
+      triggerElement: startButton,
+      onConfirm: () => startSession(surah, fromAyah, toAyah),
+    });
+  }
+
+  /**
+   * @param {number} surah
+   * @param {number} fromAyah
+   * @param {number} toAyah
+   */
+  function startSession(surah, fromAyah, toAyah) {
     const state = store.getState();
     const nowMs = now();
     const session = createSession({
@@ -156,6 +175,8 @@ export function render(container, ctx) {
     store.setState({ ...state, sessions: [...state.sessions, session] });
     navigate("session");
   }
+
+  const startButton = bigButton({ text: "ابدأ الجلسة", onClick: handleStart, size: "lg" });
 
   const view = el("div", { className: "view view-new-session" }, [
     el("section", { className: "card card--hero" }, [
@@ -186,9 +207,7 @@ export function render(container, ctx) {
         ]),
       ]),
       errorBox,
-      el("div", { className: "actions" }, [
-        bigButton({ text: "ابدأ الجلسة", onClick: handleStart, size: "lg" }),
-      ]),
+      el("div", { className: "actions" }, [startButton]),
     ]),
   ]);
 

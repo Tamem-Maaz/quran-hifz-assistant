@@ -163,7 +163,15 @@ function buildPreferencesCard(ctx, state, ui) {
       ]),
     ]),
 
-    el("div", { className: "actions actions--inline" }, [bigButton({ text: "حفظ", onClick: handleSave })]),
+    el("div", { className: "actions actions--inline" }, [bigButton({
+        text: "حفظ",
+        confirm: {
+          title: "حفظ الإعدادات؟",
+          message: "تُطبَّق القيم الجديدة على السبق القادم؛ الجلسة المفتوحة حاليًا تكمل بأهدافها الأصلية.",
+          confirmLabel: "نعم، احفظ",
+        },
+        onClick: handleSave,
+      })]),
   ];
 
   if (ui.savedFlash) {

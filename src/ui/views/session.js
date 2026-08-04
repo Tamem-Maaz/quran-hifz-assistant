@@ -171,6 +171,11 @@ function buildRecitation(session, ctx) {
       bigButton({
         text: "أخطأت هنا",
         variant: "secondary",
+        confirm: {
+          title: `تسجيل خطأ عند آية ${ayah}؟`,
+          message: "يُضاف إلى سجلّ الأخطاء، ويظهر الموضع في «أكثر المواضع تعثّرًا».",
+          confirmLabel: "نعم، سجّل الخطأ",
+        },
         onClick: () => {
           const s = ctx.store.getState();
           const entry = recordMistake(session, portion.surah, ayah, ctx.now(), "", crypto.randomUUID());
@@ -203,6 +208,11 @@ function buildRecitation(session, ctx) {
       bigButton({
         text: "أنهيت التسميع",
         size: "lg",
+        confirm: {
+          title: "إنهاء مرحلة التسميع؟",
+          message: "تُحفظ الأخطاء المسجّلة واسم المسمِّع والملاحظات، وتكتمل المرحلة السادسة.",
+          confirmLabel: "نعم، أنهيت التسميع",
+        },
         onClick: () =>
           updateSession(ctx, session.id, (s) =>
             completeRecitation(s, ctx.now(), listenerInput.value.trim(), notesInput.value.trim())

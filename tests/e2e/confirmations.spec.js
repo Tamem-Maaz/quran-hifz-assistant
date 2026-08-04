@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
-import { startNewSession } from "./helpers.js";
+import { pressStage, startNewSession } from "./helpers.js";
 
 /**
- * سؤال التأكيد قبل الأفعال المؤثّرة. المطلوب إثباته ثلاثة أمور: أن الفعل لا
- * يقع بمجرّد الضغط، وأن التراجع (بالزرّ أو بـEscape) لا يترك أثرًا، وأن
- * عدّادات المراحل تبقى خارج هذا الشرط — وإلا صارت الحلقة اليومية شاقّة.
+ * سؤال التأكيد قبل كل فعل. المطلوب إثباته ثلاثة أمور: أن الفعل لا يقع بمجرّد
+ * الضغط، وأن التراجع (بالزرّ أو بـEscape) لا يترك أثرًا، وأن أزرار المراحل
+ * وعدّاداتها مشمولةٌ بالشرط نفسه — بما فيها «كررت مرة» في كل ضغطة.
  */
 
-test.describe("تأكيد الأفعال المؤثّرة", () => {
+test.describe("تأكيد الأفعال", () => {
   test("«رجوع» في نافذة التأكيد لا يُنهي الجلسة", async ({ page }) => {
     await page.goto("/");
     await startNewSession(page);
@@ -47,17 +47,42 @@ test.describe("تأكيد الأفعال المؤثّرة", () => {
     await expect(page.getByRole("button", { name: "استئناف" })).toHaveCount(0);
   });
 
-  test("عدّادات المراحل لا تسأل: «كررت مرة» يزيد فورًا بلا نافذة", async ({ page }) => {
+  test("أزرار المراحل تسأل أيضًا: «استمعت» لا تُنهي المرحلة إلا بالتأكيد", async ({ page }) => {
+    await page.goto("/");
+    await startNewSession(page);
+    await expect(page.getByRole("heading", { name: "الاستماع", exact: true })).toBeVisible();
+
+    await page.getByRole("button", { name: "استمعت" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "رجوع" }).click();
+    await expect(page.getByRole("heading", { name: "الاستماع", exact: true })).toBeVisible();
+
+    await pressStage(page, "استمعت");
+    await expect(page.getByRole("heading", { name: "قراءة التفسير" })).toBeVisible();
+  });
+
+  test("عدّاد التكرار يسأل في كل ضغطة، ونصّ السؤال يذكر الرقم القادم", async ({ page }) => {
     await page.goto("/");
     await startNewSession(page);
     for (const label of ["استمعت", "قرأت التفسير", "استمعت"]) {
-      await page.getByRole("button", { name: label }).click();
+      await pressStage(page, label);
     }
     await expect(page.getByRole("heading", { name: "الحفظ بالتكرار" })).toBeVisible();
 
     await page.getByRole("button", { name: "كررت مرة" }).click();
-
-    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("dialog")).toContainText("يصير العدّاد 1 من 10");
+    await page.getByRole("dialog").getByRole("button", { name: "نعم، كررت مرة" }).click();
     await expect(page.getByText("1 / 10")).toBeVisible();
+
+    // التراجع فعلٌ أيضًا: له سؤاله
+    await page.getByRole("button", { name: "تراجع" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "نعم، تراجع" }).click();
+    await expect(page.getByText("0 / 10")).toBeVisible();
+  });
+
+  test("التنقّل لا يسأل: أزرار الشريط الجانبي تفتح الشاشات مباشرة", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "الإحصائيات" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "الإحصائيات" })).toBeVisible();
   });
 });

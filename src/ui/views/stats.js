@@ -158,6 +158,11 @@ function buildGoalCard(ctx, state) {
     el("div", { className: "actions actions--inline" }, [
       bigButton({
         text: "تعيين الهدف",
+        confirm: {
+          title: "تعيين الهدف اليومي؟",
+          message: "يُسجَّل الهدف من اليوم، ويظهر تقدّمك نحوه في هذه الشاشة.",
+          confirmLabel: "نعم، عيّن الهدف",
+        },
         onClick: () => {
           const ayahsPerDay = Math.max(1, Number(input.value) || 1);
           const current = store.getState();

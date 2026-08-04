@@ -28,15 +28,50 @@ export function stepCounter({ count, target, onIncrement, onDecrement, increment
 
   children.push(display);
 
-  const actionButtons = [bigButton({ text: incrementLabel, onClick: onIncrement, size: "lg" })];
+  const actionButtons = [
+    bigButton({
+      text: incrementLabel,
+      onClick: onIncrement,
+      size: "lg",
+      confirm: {
+        title: `تأكيد: ${incrementLabel}؟`,
+        message: incrementMessage(count, target),
+        confirmLabel: `نعم، ${incrementLabel}`,
+      },
+    }),
+  ];
   if (onDecrement) {
     actionButtons.push(
-      bigButton({ text: "تراجع", onClick: onDecrement, variant: "secondary", ariaLabel: "تراجع خطوة واحدة" })
+      bigButton({
+        text: "تراجع",
+        onClick: onDecrement,
+        variant: "secondary",
+        ariaLabel: "تراجع خطوة واحدة",
+        confirm: {
+          title: "تراجع عن آخر خطوة؟",
+          message: `ينزل العدّاد من ${count} إلى ${Math.max(0, count - 1)}.`,
+          confirmLabel: "نعم، تراجع",
+        },
+      })
     );
   }
   children.push(el("div", { className: "actions" }, actionButtons));
 
   return el("div", { className: "counter" }, children);
+}
+
+/**
+ * نصّ التأكيد للزيادة: يذكر أثر الضغطة لا مجرّد إعادة صياغة الزرّ — إلى أي
+ * رقم يصير العدّاد، وهل هذه الضغطة بالذات هي التي تُنهي المرحلة.
+ * @param {number} count
+ * @param {number} [target]
+ * @returns {string}
+ */
+function incrementMessage(count, target) {
+  const next = count + 1;
+  if (!target) return "بهذه الضغطة تكتمل المرحلة وتنتقل إلى التالية.";
+  if (next >= target) return `يصير العدّاد ${next} من ${target} — وبها تكتمل المرحلة وتنتقل إلى التالية.`;
+  return `يصير العدّاد ${next} من ${target}.`;
 }
 
 /**

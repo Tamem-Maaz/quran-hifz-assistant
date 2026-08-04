@@ -11,7 +11,7 @@ export async function startNewSession(page, { surah = "2", from = "12", to = "15
   await page.getByLabel("السورة").selectOption(surah);
   await page.getByLabel("من آية").fill(from);
   await page.getByLabel("إلى آية").fill(to);
-  await page.getByRole("button", { name: "ابدأ الجلسة" }).click();
+  await clickAndConfirm(page, "ابدأ الجلسة", "نعم، ابدأ الجلسة");
 }
 
 /**
@@ -27,21 +27,31 @@ export async function clickAndConfirm(page, actionName, confirmName) {
 }
 
 /**
+ * يضغط زرّ مرحلة ويؤكّده. نصّ زرّ التأكيد لأزرار العدّاد مشتقّ آليًا من نصّ
+ * الزرّ نفسه («استمعت» ← «نعم، استمعت»)، فتكفي تسمية واحدة هنا.
+ * @param {import('@playwright/test').Page} page
+ * @param {string} label
+ */
+export async function pressStage(page, label) {
+  await clickAndConfirm(page, label, `نعم، ${label}`);
+}
+
+/**
  * يُتمّ المراحل الست كاملة لجلسة مفتوحة حاليًا، بدءًا من المرحلة الأولى.
  * @param {import('@playwright/test').Page} page
  * @param {number} [targetReps]
  */
 export async function completeAllStages(page, targetReps = 10) {
-  await page.getByRole("button", { name: "استمعت" }).click(); // listeningBefore
-  await page.getByRole("button", { name: "قرأت التفسير" }).click(); // tafsir
-  await page.getByRole("button", { name: "استمعت" }).click(); // listeningAfter
+  await pressStage(page, "استمعت"); // listeningBefore
+  await pressStage(page, "قرأت التفسير"); // tafsir
+  await pressStage(page, "استمعت"); // listeningAfter
 
   for (let i = 0; i < targetReps; i++) {
-    await page.getByRole("button", { name: "كررت مرة" }).click();
+    await pressStage(page, "كررت مرة");
   }
 
-  await page.getByRole("button", { name: "راجعت" }).click(); // review
-  await page.getByRole("button", { name: "أنهيت التسميع" }).click(); // recitation
+  await pressStage(page, "راجعت"); // review
+  await pressStage(page, "أنهيت التسميع"); // recitation
 
   await clickAndConfirm(page, "إنهاء الجلسة وجدولة المراجعة", "نعم، أنهِ وجدوِل");
 }
